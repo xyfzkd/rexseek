@@ -1,7 +1,7 @@
 #matrix_path = 'inst/extdata/scirep_sequential_qc.txt'
 #classinfo_path = 'scirep_classes.txt'
 
-#' @title read count matrix
+#' @title read counts matrix
 #'
 #' @param path string.
 #' @param ... other arguments passsed on to [readr::read_tsv()]

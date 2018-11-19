@@ -73,8 +73,7 @@ reference_transcript <- tibble::tibble(id = reference_transcript_id) %>%
 
 'inst/extdata/scirep_sequential_qc.txt' %>% read_mat()  %>% rexseek::filter_low()%>% norm_tmm() -> x
 
-mi_pi_id <- annotation %>%
-	dplyr::filter(transcript_type %in% c('miRNA', 'piRNA')) %>% .$transcript_id
+
 ```
 
 ```{r read-data}
@@ -156,8 +155,6 @@ system.time(norm_SCnorm(mat[1:1000, ]*100))
 mat_tmm <- mat %>% rexseek::norm_tmm()
 
 mat_tmm %>% colMeans() %>% {./mean(.)} %>% head()
-
-microbenchmark::microbenchmark(mat[1:1000, ] %>% rexseek::norm_tmm(), times = 10)
 ```
 
 
@@ -168,37 +165,24 @@ mat_rle %>% colMeans() %>% {./mean(.)} %>% head()
 ```
 
 ```{r CPM}
-mat_cpm <- t(t(mat*1e6) / colSums(mat, na.rm = T))
+mat_cpm <- rexseek::norm_cpm(mat)
 
 mat_cpm %>% colMeans() %>% head()
 ```
 
 ```{r CPM-top}
-k = 20
-if (nrow(mat) < k) stop('two few feature for CPM top k normalization')
-
-row_top <-  mat %>% rownames() %>% sort(decreasing = T, index.return = T) %>%
-	.$ix %>% {.[seq_len(k)]}
-mat_cpm_top <- t(t(mat*1e6) / colSums(mat[row_top, ], na.rm = T))
 
 mat_cpm_top %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
 ```
 
 ```{r cpm-rm}
-row_no_mi_pi <- mat %>% rownames() %>% stringr::str_extract('[^|]+') %>% 
-	{!(. %in% mi_pi_id)}
-mat_cpm_rm <- t(t(mat*1e6) / colSums(mat[row_no_mi_pi, ], na.rm = T))
 
-mat_cpm_rm %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
 ```
 
 
 
 ```{r cpm-refer}
-row_refer <- mat %>% rownames() %>% {. %in% reference_transcript_id}
-mat_cpm_refer <- t(t(mat*1e6) / colSums(mat[row_refer, ], na.rm = T))
 
-mat_cpm_refer %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
 ```
 
 

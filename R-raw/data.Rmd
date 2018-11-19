@@ -17,7 +17,7 @@ rm(list = ls(envir = globalenv(), all = T))
 Process you raw data here.
 
 ```{r}
-reference_transcript_id <- c(
+suggest_refer_tran_id <- c(
     'ENST00000408438.1|MIR1228-201|73',
     'ENST00000385271.1|MIR16-1-201|89',
     'ENST00000607334.3|MIR15A-201|83',
@@ -29,33 +29,32 @@ reference_transcript_id <- c(
     'ENST00000384832.1|MIR23B-201|97',
     'ENST00000579846.3|MIR23C-201|100'
 )
+usethis::use_data(suggest_refer_tran_id, overwrite = TRUE)
+
 reference_transcript <- tibble::tibble(id = reference_transcript_id) %>% 
 	dplyr::mutate(name = stringr::str_remove(id, '^[^\\|]+\\|')) %>%
 	dplyr::mutate(name = stringr::str_remove(name, '\\|[^\\|]+$')) %>% 
 	dplyr::mutate(name = stringr::str_remove(name, '-\\d+$'))
 
-
-annotation <- 'inst/extdata/all.txt' %>% 
-	readr::read_file() %>% readr::read_tsv() %>% 
+rna_type <-  'inst/extdata/all.txt' %>% readr::read_tsv() %>% 
 	dplyr::select('transcript_id', 'transcript_type')
-mi_pi_id <- annotation %>%
-	dplyr::filter(transcript_type %in% c('miRNA', 'piRNA')) %>% .$transcript_id
+usethis::use_data(rna_type, overwrite = TRUE)
 ```
 
 
 ```{r}
 mat_raw <- 'inst/extdata/scirep_sequential_qc.txt' %>% rexseek::read_mat()
 mat <- mat_raw %>% rexseek::filter_low()
-mat1000 <- mat_raw %>% {.[sample(nrow(.), 1000), ]}
+mat1000 <- mat_raw %>% {.[sample(nrow(.), 1000), ]*10}
 
-usethis::use_data(mat1000)
+usethis::use_data(mat1000, overwrite = TRUE)
 ```
 
 
 ```{r}
 sample_class <- 'inst/extdata/scirep_classes.txt' %>% readr::read_csv(T, 'cc')
 
-usethis::use_data(sample_class)
+usethis::use_data(sample_class, overwrite = TRUE)
 ```
 
 ```{r rebuild, include=FALSE}

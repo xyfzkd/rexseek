@@ -3,6 +3,7 @@
 export(as_SingleCellExperiment)
 export(filter_low)
 export(norm_SCnorm)
+export(norm_cpm)
 export(norm_rle)
 export(norm_tmm)
 export(plot_PCA)
