@@ -11,4 +11,15 @@ LazyData: true
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE, roclets=c('rd', 'collate', 'namespace'))
 Imports: 
-    magrittr
+    magrittr,
+    readr,
+    tibble,
+    dplyr,
+    stringr,
+    ggplot2
+Remotes: 
+    bioc::3.7/scater,
+    bioc::3.7/SingleCellExperiment,
+    bioc::3.7/scImpute,
+    bioc::3.7/SCnorm
+
