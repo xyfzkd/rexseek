@@ -18,8 +18,8 @@ Imports:
     stringr,
     ggplot2
 Remotes: 
+    Vivianstats/scImpute,
     bioc::3.7/scater,
     bioc::3.7/SingleCellExperiment,
-    bioc::3.7/scImpute,
     bioc::3.7/SCnorm
 
