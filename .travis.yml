@@ -1,0 +1,35 @@
+language: r
+matrix:
+  include:
+    - r: release
+    - language: generic
+      services: docker
+    - os: osx
+    - r: oldrel
+cache: packages
+git:
+  depth: false
+
+before_install:
+  # leave the interface for the future support of docker build
+  - if [ "$TRAVIS_R_VERSION" == "" ]; then
+        docker run -d -t --name devtools0 -v "$PWD":/home/docker/travis -w /home/docker/travis -u docker r-base;
+        shopt -s expand_aliases; alias R='docker exec devtools0 R';
+        R --version; alias R='echo'; 
+    fi;    
+  # combined with a weekly cron job, package cache would be updated quarterly (first week of first month of each quarter)
+  - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then 
+        R --slave -e "date <- Sys.Date(); day <- as.integer(substr(date, 9, 10)); month <- as.integer(substr(date, 6, 7)); clean <- month %% 3L == 1L && day <= 7L; if (clean) unlink(dir(.libPaths()[1], full.names = T), recursive = T)"; 
+    fi;
+install:
+  - R --slave -e "update.packages(.libPaths()[1], ask = F)";
+  - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')";
+script:
+  - R --slave -e "devtools::install_local(getwd())";
+  - ls tests/testthat/*.R || travis_terminate 0;   # devtools::test() requires `tests/testthat` directory, but testthat::test_dir() dictate there must be a R script   
+  - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2'))";
+  # devtools::test() loads all and report result, testthat::test_dir() exit no-zero when a test fails  
+  - R --slave -e "devtools::test(); testthat::test_dir('tests/testthat/', reporter = 'fail')";
+
+notifications:
+  email: false
