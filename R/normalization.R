@@ -7,17 +7,18 @@ norm_SCnorm <- function(mat) {
 
 #' @export
 norm_tmm <- function(mat) {
-	mat_tmm <- mat %>% as_SingleCellExperiment() %>%
+	mat %>% as_SingleCellExperiment() %>%
 		{suppressWarnings(scater::normaliseExprs(., "TMM"))} %>%
-		scater::normalise() %>% SingleCellExperiment::normcounts()
-	mode(mat_tmm) <- 'integer'
+		scater::normalise() %>% SingleCellExperiment::normcounts() %T>%
+		{mode(.) <- 'integer'}
 }
 
 #' @export
 norm_rle <- function(mat) {
 	mat %>% as_SingleCellExperiment() %>%
 		{suppressWarnings(scater::normaliseExprs(., "RLE"))} %>%
-		scater::normalise() %>% SingleCellExperiment::normcounts()
+		scater::normalise() %>% SingleCellExperiment::normcounts()%T>%
+		{mode(.) <- 'integer'}
 }
 
 #norm_tmm(mat_raw)

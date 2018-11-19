@@ -52,6 +52,12 @@ usethis::use_data(mat1000)
 ```
 
 
+```{r}
+sample_class <- 'inst/extdata/scirep_classes.txt' %>% readr::read_csv(T, 'cc')
+
+usethis::use_data(sample_class)
+```
+
 ```{r rebuild, include=FALSE}
 system('R CMD INSTALL --no-multiarch --with-keep.source .')
 devtools::reload();

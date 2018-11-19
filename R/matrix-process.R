@@ -17,21 +17,21 @@ read_mat <- function(path, ...) {
 		tibble::column_to_rownames('transcript') %>% as.matrix()
 }
 
-#' Title
+#' @title filter genes with low expression values
 #'
 #' @param mat integer matrix.
-#' @param thres_count integer scalar.
-#' @param thres_sample_nums integer scalar.
+#' @param min_count, min_sample_per_gene integer scalar. For each gene, it must contain at least `min_count` reads in at least `min_sample_per_gene` samples. Otherwise, it would be dropped.
 #'
-#' @return scater::calculateQCMetrics()
+#' @return integer matrix.
 #' @export
 #'
 #' @examples NULL
-filter_low <- function(mat, thres_count = 2, thres_sample_nums = 5) {
-	low_per_row <- rowSums(mat > thres_count)
-	keeped_row <- low_per_row > thres_sample_nums
+filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
+	low_per_row <- rowSums(mat > min_count)
+	keeped_row <- low_per_row > min_sample_per_gene
 	mat[keeped_row, ]
 }
+
 
 #' @export
 plot_highest_exprs <- function(sce) {
@@ -39,23 +39,27 @@ plot_highest_exprs <- function(sce) {
 		scater::plotHighestExprs(n = 20)
 }
 
+#' @title plot PCA, TSNE
+#'
 #' @param sce A SingleCellExperiment object.
+#' @param shape, color string. specify a column in `col_data` of [as_SingleCellExperiment()] to shape/color by
 #'
 #' @export
-plot_PCA <- function(sce) {
+plot_PCA <- function(sce, shape = NULL, color = NULL) {
 	sce %>% scater::plotPCA(
-		shape_by = "label", colour_by = "label",
-    	run_args = list(exprs_values = "counts")
+		shape_by = shape, colour_by = color,
+    	run_args = list(exprs_values = 'counts')
 	)
 }
 
-#'
-#' @param sce A SingleCellExperiment object.
+
+
+#' @describeIn plot_PCA
 #'
 #' @export
-plot_TSNE <- function(sce) {
+plot_TSNE <- function(sce, shape = NULL, color = NULL) {
 	sce %>% scater::plotTSNE(
-	    shape_by = "label", colour_by = "label",
+	    shape_by = shape, colour_by = color,
 	    run_args = list(exprs_values = "counts")
 	)
 }

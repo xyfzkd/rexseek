@@ -78,19 +78,9 @@ mi_pi_id <- annotation %>%
 ```
 
 ```{r read-data}
-matrix_path = 'inst/extdata/scirep_sequential_qc.txt'
-classinfo_path = 'inst/extdata/scirep_classes.txt'
-
-
-mat_raw <- matrix_path %>% rexseek::read_mat()
-info <- classinfo_path %>% readr::read_csv(T, 'cc') %T>% print
+mat_raw <- 'inst/extdata/scirep_sequential_qc.txt' %>% rexseek::read_mat()
+sample_class <- 'inst/extdata/scirep_classes.txt' %>% readr::read_csv(T, 'cc') %T>% print
 ```
-
-
-```{r}
-
-```
-
 
 ```{r filter-low-value}
 mat <- mat_raw %>% rexseek::filter_low()
@@ -100,9 +90,7 @@ mat <- mat_raw %>% rexseek::filter_low()
 ```
 
 ```{r make-SingleCellExperiment}
-reads <- SingleCellExperiment::SingleCellExperiment(
-    assays =  list(counts = mat), colData = info
-) %T>% print
+reads <- rexseek::as_SingleCellExperiment(mat, col_data = sample_class) %T>% print
 ```
 
 
@@ -111,11 +99,11 @@ reads %>% rexseek::plot_highest_exprs()
 ```
 
 ```{r plotPCA}
-reads %>% rexseek::plot_PCA()
+reads %>% rexseek::plot_PCA(shape = 'label', color = 'label')
 ```
 
 ```{r plotTSNE}
-reads %>% rexseek::plot_TSNE()
+reads %>% rexseek::plot_TSNE(shape = 'label', color = 'label')
 ```
 
 
@@ -132,7 +120,7 @@ if(FLASE) {
 	    function(...) {scImpute::scimpute(...)}, 
 	    args = list(
 	        'tmpsave.csv', out_dir = impute_outdir, Kcluster = 5, ncores = 2, labeled = TRUE, 
-	        labels = colnames(mat) %>% {.[-1]} %>% plyr::mapvalues(info[[1]], info[[2]], F)
+	        labels = colnames(mat) %>% {.[-1]} %>% plyr::mapvalues(sample_class[[1]], sample_class[[2]], F)
 	    )
 	)
 	
@@ -265,10 +253,10 @@ g_violin + ggplot2::geom_text(ggplot2::aes(x, y + 1, label = value), g_violin_te
 
 
 ```{r}
-scIdx <- matrix(-1, ncol = max(table(info$label)), nrow = 2)
-tmp <- which(info$label == "Colorectal Cancer")
+scIdx <- matrix(-1, ncol = max(table(sample_class$label)), nrow = 2)
+tmp <- which(sample_class$label == "Colorectal Cancer")
 scIdx[1, 1:length(tmp)] <- tmp
-tmp <- which(info$label == "Healthy Control")
+tmp <- which(sample_class$label == "Healthy Control")
 
 scIdx[2, 1:length(tmp)] <- tmp  #给label信息
 #scIdx[1, 1:length(tmp)] <- tmp #不给label信息
@@ -296,7 +284,7 @@ mod_data <- as.data.frame(t(combat_data))
 # Basic batch removal
 mod0 = model.matrix(~ 1, mod_data) 
 # Preserve biological variability
-mod1 = model.matrix(~ info$label, mod_data) 
+mod1 = model.matrix(~ sample_class$label, mod_data) 
 
 combat <- sva::ComBat(
     dat = t(mod_data), 
