@@ -1,0 +1,331 @@
+---
+title: "matrix processing"
+author: "Zhuoer Dong"
+date: "November 6, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = F, error = T)
+```
+
+https://github.com/lulab/exSeek-dev/blob/master/docs/matrix_processing.md
+http://166.111.156.58:8000/jupyter/user/zhuoer/notebooks/exseek/jupyter/matrix_processing.ipynb
+
+# to do:
+
+- use small makrdown to save plot
+- check dimension after each step
+
+```{r message=FALSE}
+```
+
+# To Do
+- 使用哪两类/多类样本
+- 路径
+- filter写成函数 外界传入要求
+- top k 阈值
+- 串起来时变量冲突问题
+- batch removal需要log再变回去
+- cpm，remove pi、mi，top20，reference gene等方法并入R
+- RUVs 用或者不用样本信息
+- combat必须用类别信息
+- alignment score
+- ruvs, combat log and reverse
+- scnorm分析图
+- ruvs分析图
+- 确保输入数据格式没有问题
+
+filename, savename, use which operation, pipeline
+- Imputation
+    - scImpute
+- Normalization
+    - CPM
+    - Top20
+    - Remove pi, miRNA
+    - TMM
+    - RLE
+    - SCNorm
+- Batch Removal
+    - RUVs: need logged normalization matrix
+    - Combat: need logged normalization matrix
+
+# load data
+
+
+```{r}
+reference_transcript_id <- c(
+    'ENST00000408438.1|MIR1228-201|73',
+    'ENST00000385271.1|MIR16-1-201|89',
+    'ENST00000607334.3|MIR15A-201|83',
+    'ENST00000385059.1|MIR451A-201|72',
+    'ENST00000362134.1|MIR21-201|72',
+    'ENST00000385245.1|MIR23A-201|73',
+    'ENST00000385045.1|MIR15B-201|98',
+    'ENST00000362117.1|MIR16-2-201|81',
+    'ENST00000384832.1|MIR23B-201|97',
+    'ENST00000579846.3|MIR23C-201|100'
+)
+reference_transcript <- tibble::tibble(id = reference_transcript_id) %>% 
+	dplyr::mutate(name = stringr::str_remove(id, '^[^\\|]+\\|')) %>%
+	dplyr::mutate(name = stringr::str_remove(name, '\\|[^\\|]+$')) %>% 
+	dplyr::mutate(name = stringr::str_remove(name, '-\\d+$'))
+
+'inst/extdata/scirep_sequential_qc.txt' %>% read_mat()  %>% rexseek::filter_low()%>% norm_tmm() -> x
+
+mi_pi_id <- annotation %>%
+	dplyr::filter(transcript_type %in% c('miRNA', 'piRNA')) %>% .$transcript_id
+```
+
+```{r read-data}
+matrix_path = 'inst/extdata/scirep_sequential_qc.txt'
+classinfo_path = 'inst/extdata/scirep_classes.txt'
+
+
+mat_raw <- matrix_path %>% rexseek::read_mat()
+info <- classinfo_path %>% readr::read_csv(T, 'cc') %T>% print
+```
+
+
+```{r}
+
+```
+
+
+```{r filter-low-value}
+mat <- mat_raw %>% rexseek::filter_low()
+```
+
+```{r to-matrix}
+```
+
+```{r make-SingleCellExperiment}
+reads <- SingleCellExperiment::SingleCellExperiment(
+    assays =  list(counts = mat), colData = info
+) %T>% print
+```
+
+
+```{r plotHighestExprs}
+reads %>% rexseek::plot_highest_exprs()
+```
+
+```{r plotPCA}
+reads %>% rexseek::plot_PCA()
+```
+
+```{r plotTSNE}
+reads %>% rexseek::plot_TSNE()
+```
+
+
+```{r imputation, eval=F}
+if(FLASE) {
+	impute_tmpdir <- tempdir();
+	impute_infile <- paste0(impute_tmpdir, '/pre_counts.csv');
+	impute_outdir <- paste0(impute_tmpdir, '/output')
+	
+	mat %T>% {colnames(.)[1] <- ''} %>% readr::write_csv(impute_infile)
+	
+	#callr::r(
+	do.call(
+	    function(...) {scImpute::scimpute(...)}, 
+	    args = list(
+	        'tmpsave.csv', out_dir = impute_outdir, Kcluster = 5, ncores = 2, labeled = TRUE, 
+	        labels = colnames(mat) %>% {.[-1]} %>% plyr::mapvalues(info[[1]], info[[2]], F)
+	    )
+	)
+	
+	dir(impute_outdir)
+}
+```
+
+
+
+# normalization
+
+```{r pre-norm}
+mat %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head
+```
+
+
+```{r SCnorm}
+if (!file.exists('data-raw/mat_SCnorm.rds')) {
+	mat_SCnorm < mat %>% 
+		{SCnorm::SCnorm(., Conditions = rep(1, ncol(.)), PrintProgressPlots = T)} %>% 
+		SingleCellExperiment::normcounts()
+	readr::write_rds(mat_SCnorm, 'data-raw/mat_SCnorm.rds')
+} else
+	mat_SCnorm <- readr::read_rds('data-raw/mat_SCnorm.rds')
+
+mat_SCnorm %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head
+
+system.time(norm_SCnorm(mat[1:1000, ]*100))
+```
+
+
+```{r TMM}
+mat_tmm <- mat %>% rexseek::norm_tmm()
+
+mat_tmm %>% colMeans() %>% {./mean(.)} %>% head()
+
+microbenchmark::microbenchmark(mat[1:1000, ] %>% rexseek::norm_tmm(), times = 10)
+```
+
+
+```{r RLE}
+mat_rle <-  mat %>% rexseek::norm_rle()
+
+mat_rle %>% colMeans() %>% {./mean(.)} %>% head()
+```
+
+```{r CPM}
+mat_cpm <- t(t(mat*1e6) / colSums(mat, na.rm = T))
+
+mat_cpm %>% colMeans() %>% head()
+```
+
+```{r CPM-top}
+k = 20
+if (nrow(mat) < k) stop('two few feature for CPM top k normalization')
+
+row_top <-  mat %>% rownames() %>% sort(decreasing = T, index.return = T) %>%
+	.$ix %>% {.[seq_len(k)]}
+mat_cpm_top <- t(t(mat*1e6) / colSums(mat[row_top, ], na.rm = T))
+
+mat_cpm_top %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
+```
+
+```{r cpm-rm}
+row_no_mi_pi <- mat %>% rownames() %>% stringr::str_extract('[^|]+') %>% 
+	{!(. %in% mi_pi_id)}
+mat_cpm_rm <- t(t(mat*1e6) / colSums(mat[row_no_mi_pi, ], na.rm = T))
+
+mat_cpm_rm %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
+```
+
+
+
+```{r cpm-refer}
+row_refer <- mat %>% rownames() %>% {. %in% reference_transcript_id}
+mat_cpm_refer <- t(t(mat*1e6) / colSums(mat[row_refer, ], na.rm = T))
+
+mat_cpm_refer %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
+```
+
+
+density plot: coefficient of variance 
+
+```{r refer-cv-density}
+coef_var_fun <- function(x) {sd(x, na.rm = T) / mean(x, na.rm = T)}
+
+coef_var_df <- mat %>% apply(1, coef_var_fun) %>% 
+	{tibble::tibble(id = names(.), value = .)}
+coef_var_refer_df <- coef_var_df %>% dplyr::filter(id %in% reference_transcript_id)
+
+ggplot2::ggplot(coef_var_df) + 
+	ggplot2::geom_density(ggplot2::aes(value), color = 'blue') + 
+	ggplot2::geom_vline(xintercept = coef_var_refer_df$value, color = 'green', size = 0.1)
+```
+
+
+```{r refer-count-violin, fig.keep='last'}
+# violin plot: reference gene counts
+g_violin <- mat %>% {log2(. + 0.001)} %>% tibble::as_tibble(rownames = 'id') %>% 
+	dplyr::inner_join(reference_transcript, ., by = 'id') %>% dplyr::select(-id) %>%
+	tidyr::gather('sample', 'count', -1) %>% 
+	ggplot2::ggplot(ggplot2::aes(name, count)) + ggplot2::geom_violin() +
+	ggplot2::labs(x = 'reference transcripts', y = quote(log[2](count)))
+
+## dig out computed values in ggplot
+sink(tempfile())
+g_violin_df <- NULL;
+g_violin_fun <- function(x) {g_violin_df <<- tibble::as_tibble(x)}
+g_violin + gginnards::stat_debug_panel(summary.fun = g_violin_fun)
+sink()
+
+## construct tibble to label coef_var value
+g_violin_text_df <- dplyr::bind_cols(
+	g_violin_df %>% dplyr::group_by(x) %>% dplyr::arrange(dplyr::desc(y)) %>%
+		dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::arrange(x) %>% dplyr::select(x, y),
+	coef_var_refer_df %>% dplyr::inner_join(reference_transcript, ., by = 'id') %>% 
+		dplyr::arrange(name) %>% dplyr::select(value) 
+	#" note the order of `x` is matched with factor level order of `name` (in `geom_violin()`)
+	#" so we can use two `arrange()` to match the order of two tibble
+) %>% dplyr::mutate(value = formatC(value, digits = 2, format = 'f'))
+
+## final plot
+g_violin + ggplot2::geom_text(ggplot2::aes(x, y + 1, label = value), g_violin_text_df)
+```
+
+
+# batch effect
+
+
+
+
+```{r}
+scIdx <- matrix(-1, ncol = max(table(info$label)), nrow = 2)
+tmp <- which(info$label == "Colorectal Cancer")
+scIdx[1, 1:length(tmp)] <- tmp
+tmp <- which(info$label == "Healthy Control")
+
+scIdx[2, 1:length(tmp)] <- tmp  #给label信息
+#scIdx[1, 1:length(tmp)] <- tmp #不给label信息
+cIdx <- rownames(mat)
+ruvs <- RUVSeq::RUVs(mat, cIdx, k = 10, scIdx = scIdx, isLog = TRUE) #k可调节
+
+```
+
+```{r}
+res <- list()
+for(n in SummarizedExperiment::assayNames(reads)) {
+    res[[n]] <- scRNA.seq.funcs::calc_cell_RLE(SummarizedExperiment::assay(reads, n))
+}
+par(mar=c(6,4,1,1))
+boxplot(res, las=2)
+```
+
+
+```{r}
+batch_info <- readr::read_csv('inst/extdata/scirep_batch.txt', T, 'ciii') %>% 
+	dplyr::select(sample_id = 1, batch = 2)
+
+combat_data <- log(mat + 0.001)
+mod_data <- as.data.frame(t(combat_data))
+# Basic batch removal
+mod0 = model.matrix(~ 1, mod_data) 
+# Preserve biological variability
+mod1 = model.matrix(~ info$label, mod_data) 
+
+combat <- sva::ComBat(
+    dat = t(mod_data), 
+    batch = factor(batch_info$batch), 
+    mod = mod1,
+    par.prior = TRUE,
+    prior.plots = FALSE
+)
+
+exp(combat)[1:6, 1:2]
+
+
+for (n in SummarizedExperiment::assayNames(reads)) {
+    print(
+        scater::plotQC(
+            reads,
+            type = "expl",
+            exprs_values = n,
+            variables = c(
+                "total_features",
+                "total_counts",
+                "Class",
+                'RNA.Isolation.batch',
+                'library.prepration.day',
+                'gel.cut.size.selection'
+            )
+        ) +
+        ggplot2::ggtitle(n)
+    )
+}
+
+```
