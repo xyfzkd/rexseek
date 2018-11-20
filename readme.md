@@ -2,7 +2,7 @@
 
 ## Overview
 
-package description
+R package for matrix processing in the exSeek project
 
 
 ## Install

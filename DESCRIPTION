@@ -1,6 +1,6 @@
 Package: rexseek
 Type: Package
-Title: What the Package Does (one line, title case)
+Title: Matrix Processing in the exSeek Project
 Version: 0.0.0.9000
 Authors@R: person("Zhuoer", "Dong", email = "dongzhuoer@mail.nankai.edu.cn", 
     role = c("aut", "cre"))
