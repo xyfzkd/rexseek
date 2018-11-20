@@ -33,6 +33,7 @@ filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
 }
 
 
+
 #' @export
 plot_highest_exprs <- function(sce) {
 	sce %>% {suppressMessages(scater::calculateQCMetrics(.))} %>%
