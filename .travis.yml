@@ -25,7 +25,7 @@ install:
   - R --slave -e "update.packages(.libPaths()[1], ask = F)";
   - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')";
 script:
-  - R --slave -e "devtools::install_local(getwd())";
+  - R --slave -e "devtools::install_local(getwd(), force = TRUE)";
   - ls tests/testthat/*.R || travis_terminate 0;   # devtools::test() requires `tests/testthat` directory, but testthat::test_dir() dictate there must be a R script   
   - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2'))";
   # devtools::test() loads all and report result, testthat::test_dir() exit no-zero when a test fails  
