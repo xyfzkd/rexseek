@@ -4,7 +4,6 @@
 
 R package for matrix processing in the exSeek project
 
-
 ## Install
 
 ```r
