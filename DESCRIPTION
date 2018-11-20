@@ -1,7 +1,7 @@
 Package: rexseek
 Type: Package
 Title: Matrix Processing in the exSeek Project
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: person("Zhuoer", "Dong", email = "dongzhuoer@mail.nankai.edu.cn", 
     role = c("aut", "cre"))
 Description: What the package does (one paragraph).
