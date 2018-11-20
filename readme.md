@@ -17,7 +17,14 @@ Refer to this [post](https://dongzhuoer.github.io/_redirects/develop-upon-my-r-p
 
 ## Non-Git
 
-Get the following big files for `data.Rmd`
+`data-raw/external/`
 
-- `inst/extdata/all.txt`
-- `inst/extdata/scirep_sequential_qc.txt`
+```r
+'data-raw/external/all.txt' %>% readr::read_tsv() %>% 
+	dplyr::select('transcript_id', 'transcript_type') %>%
+    readr::write_rds('data-raw/rna_type.rds', 'xz')
+```
+
+## Credits
+
+`rna_type` comes from [Binbin Shi](https://github.com/ltbyshi)

@@ -33,7 +33,7 @@ norm_rle <- function(mat) {
 #' @param mat integer matrix. counts
 #' @param row integer or logical. Use which rows (genes) to perfrom normalization
 norm_cpm_impl <- function(mat, row) {
-	t(t(mat*1e6) / colSums(mat[row, ], na.rm = T))
+	t(t(mat*1e6) / colSums(mat[row, , drop = F], na.rm = T))
 }
 
 # norm_cpm ------------------
@@ -87,13 +87,20 @@ norm_cpm_rm <- function(mat, transcript_type) {
 
 
 #' @describeIn norm_cpm normalize by of given reference genes
+#'
 #' @param reference_transcript_id character.
 #'
+#' @examples
+#' norm_cpm_refer(sim_mat, suggest_refer$id)
+#'
 #' @export
+
+# mat = sim_mat
+# reference_transcript_id = suggest_refer$id
 norm_cpm_refer <- function(mat, reference_transcript_id) {
 	row_refer <- mat %>% rownames() %>% stringr::str_extract('[^|]+') %>%
 		{. %in% reference_transcript_id}
-	if (length(row_refer) == 0L)
+	if (!any(row_refer))
 		stop('can\'t find any reference transcript in the matrix for CPM normalization')
 
 	norm_cpm_impl(mat, row_refer)

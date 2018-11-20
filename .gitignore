@@ -1,6 +1,5 @@
 # big data
-inst/extdata/all.txt
-inst/extdata/scirep_sequential_qc.txt
+data-raw/external/
 
 # knitr output
 *_files/

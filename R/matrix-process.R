@@ -1,4 +1,4 @@
-#matrix_path = 'inst/extdata/scirep_sequential_qc.txt'
+#matrix_path = 'data-raw/external/scirep_sequential_qc.txt'
 #classinfo_path = 'scirep_classes.txt'
 
 #' @title read counts matrix

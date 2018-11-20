@@ -2,18 +2,40 @@
 % Please edit documentation in R/normalization.R
 \name{norm_cpm}
 \alias{norm_cpm}
+\alias{norm_cpm_top}
+\alias{norm_cpm_rm}
+\alias{norm_cpm_refer}
 \title{CPM normalization}
 \usage{
 norm_cpm(mat)
+
+norm_cpm_top(mat, top_n)
+
+norm_cpm_rm(mat, transcript_type)
+
+norm_cpm_refer(mat, reference_transcript_id)
 }
 \arguments{
-\item{mat}{integer matrix. counts}
+\item{mat}{integer matrix. counts. first part (separated by \code{|}) of row names must be transcript id}
+
+\item{transcript_type}{character.}
+
+\item{reference_transcript_id}{character.}
 }
 \description{
 CPM normalization
 }
+\details{
+some functions may throw errors
+}
 \section{Functions}{
 \itemize{
 \item \code{norm_cpm}: normalize by all genes
+
+\item \code{norm_cpm_top}: normalize by top k genes sorted by expression level
+
+\item \code{norm_cpm_rm}: normalize by removing genes of given type (such as piRNAs)
+
+\item \code{norm_cpm_refer}: normalize by of given reference genes
 }}
 

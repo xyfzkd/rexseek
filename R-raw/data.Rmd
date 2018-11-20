@@ -16,8 +16,9 @@ rm(list = ls(envir = globalenv(), all = T))
 
 Process you raw data here.
 
-```{r}
-suggest_refer_tran_id <- c(
+```{r suggest_refer}
+suggest_refer <- tibble::tribble(
+	~full,
     'ENST00000408438.1|MIR1228-201|73',
     'ENST00000385271.1|MIR16-1-201|89',
     'ENST00000607334.3|MIR15A-201|83',
@@ -28,36 +29,50 @@ suggest_refer_tran_id <- c(
     'ENST00000362117.1|MIR16-2-201|81',
     'ENST00000384832.1|MIR23B-201|97',
     'ENST00000579846.3|MIR23C-201|100'
-)
-usethis::use_data(suggest_refer_tran_id, overwrite = TRUE)
-
-reference_transcript <- tibble::tibble(id = reference_transcript_id) %>% 
-	dplyr::mutate(name = stringr::str_remove(id, '^[^\\|]+\\|')) %>%
+) %>% dplyr::mutate(id = stringr::str_extract(full, '[^|]+')) %>%
+	dplyr::mutate(name = stringr::str_remove(full, '^[^\\|]+\\|')) %>%
 	dplyr::mutate(name = stringr::str_remove(name, '\\|[^\\|]+$')) %>% 
-	dplyr::mutate(name = stringr::str_remove(name, '-\\d+$'))
+	dplyr::mutate(name = stringr::str_remove(name, '-\\d+$')) %T>% print
+usethis::use_data(suggest_refer, overwrite = TRUE)
+```
 
-rna_type <-  'inst/extdata/all.txt' %>% readr::read_tsv() %>% 
-	dplyr::select('transcript_id', 'transcript_type')
+
+```{r rna_type}
+rna_type <-  readr::read_rds('data-raw/rna_type.rds') %T>% print
 usethis::use_data(rna_type, overwrite = TRUE)
 ```
 
-
 ```{r}
-mat_raw <- 'inst/extdata/scirep_sequential_qc.txt' %>% rexseek::read_mat()
-mat <- mat_raw %>% rexseek::filter_low()
-mat1000 <- mat_raw %>% {.[sample(nrow(.), 1000), ]*10}
+set.seed(0)
 
-usethis::use_data(mat1000, overwrite = TRUE)
+n_gene = 1000
+n_sample = 50;
+
+#" I use two sample_n() to roughly make sure every type of RNA is sampled
+sim_mat <- rpois(n_gene*n_sample, 5) %>% matrix(ncol = n_sample) %T>%
+	{colnames(.) <- paste0('Sample_', seq_len(n_sample))} %T>% 
+	{rownames(.) <- rna_type %>% 
+		dplyr::group_by(transcript_type) %>% dplyr::sample_n(n_gene, T) %>%
+		.$transcript_id %>% sample(n_gene) %>% 
+		c(suggest_refer$id) %>% unique %>% sample(n_gene)
+	} %T>% print
+
+
+
+sim_class <- c('Colorectal Cancer', 'Healthy Control', 'Prostate Cancer', 'Pancreatic Cancer');
+sim_sample_class <- tibble::tibble(
+	sample_id = colnames(sim_mat), label = sample(sim_class, length(sample_id), T)
+) %T>% print
+
+
+usethis::use_data(sim_mat, sim_sample_class, overwrite = TRUE)
 ```
 
 
-```{r}
-sample_class <- 'inst/extdata/scirep_classes.txt' %>% readr::read_csv(T, 'cc')
 
-usethis::use_data(sample_class, overwrite = TRUE)
-```
 
 ```{r rebuild, include=FALSE}
+devtools::document() # you may also have edited data documentation
 system('R CMD INSTALL --no-multiarch --with-keep.source .')
 devtools::reload();
 devtools::test();
