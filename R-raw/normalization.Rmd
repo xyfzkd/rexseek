@@ -1,0 +1,120 @@
+---
+title: "matrix processing"
+author: "Zhuoer Dong"
+date: "November 6, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = F, error = T)
+```
+
+https://github.com/lulab/exSeek-dev/blob/master/docs/matrix_processing.md
+http://166.111.156.58:8000/jupyter/user/zhuoer/notebooks/exseek/jupyter/matrix_processing.ipynb
+
+# to do:
+
+
+```{r message=FALSE}
+```
+
+
+# load data
+
+
+```{r read-data}
+mat_raw <- 'data-raw/external/scirep_sequential_qc.txt' %>% rexseek::read_mat() %T>% print
+sample_class <- 'data-raw/external/scirep_classes.txt' %>% readr::read_csv(T, 'cc') %T>% print
+```
+
+# filter and show
+
+```{r filter-low-value}
+mat <- mat_raw %>% rexseek::filter_low() %T>% print
+```
+
+
+```{r make-SingleCellExperiment}
+reads <- rexseek::as_SingleCellExperiment(mat, col_data = sample_class) %T>% print
+```
+
+
+```{r plot-HighestExprs}
+reads %>% rexseek::plot_highest_exprs()
+```
+
+```{r show-mat-fun, mat=mat}
+show_mat <- function(mat) {
+	mat %>% colMeans() %>% {./mean(.)} %>% head() %>% print
+	
+	reads <- rexseek::as_SingleCellExperiment(mat, col_data = sample_class)
+	reads %>% rexseek::plot_PCA(shape = 'label', color = 'label') %>% print
+	reads %>% rexseek::plot_TSNE(shape = 'label', color = 'label') %>% print
+}
+```
+
+
+
+# normalization
+
+
+```{r pre-norm}
+mat %>% show_mat()
+```
+
+
+```{r SCnorm}
+if (FLASE) {
+	mat_SCnorm <- mat %>% rexseek::norm_SCnorm(NCores = 4) 
+	
+	mat_SCnorm %>% show_mat()
+}
+```
+
+
+```{r TMM}
+mat_tmm <- mat %>% rexseek::norm_tmm()
+
+mat_tmm %>% show_mat()
+```
+
+
+```{r RLE}
+mat_rle <-  mat %>% rexseek::norm_rle()
+
+mat_rle %>% show_mat()
+```
+
+```{r CPM}
+mat_cpm <- rexseek::norm_cpm(mat)
+
+mat_cpm %>% show_mat()
+```
+
+```{r CPM-top}
+mat_cpm_top <- rexseek::norm_cpm_top(mat, 20)
+
+mat_cpm_top %>% show_mat()
+```
+
+```{r cpm-rm}
+mat_cpm_rm <- rexseek::norm_cpm_rm(mat, c('miRNA', 'piRNA'))
+
+mat_cpm_rm %>% show_mat()
+```
+
+
+
+```{r cpm-refer}
+mat_cpm_refer <- rexseek::norm_cpm_refer(mat, suggest_refer$id)
+
+mat_cpm_refer %>% show_mat()
+```
+
+
+density plot: coefficient of variance 
+
+```{r refer-cv-density}
+rexseek::plot_cv_density(mat, suggest_refer$id, suggest_refer$name)
+```
+
