@@ -17,7 +17,7 @@ norm_mat_rmd <- function() {
 #' @example
 #' \donotrun{
 #'     norm_mat(
-#'         '/path/to/matrix', c('SCnorm', 'TMM', 'RLE', 'CPM', 'CPM_top', 'CPM_rm', 'CPM_refer',
+#'         '/path/to/matrix', c('SCnorm', 'TMM', 'RLE', 'CPM', 'CPM_top', 'CPM_rm', 'CPM_refer'),
 #'         top_n = 20, rm_gene_type = c('miRNA', 'piRNA'), refer_gene_id = c("ENST00000408438.1", "ENST00000385271.1", "ENST00000607334.3", "ENST00000385059.1", "ENST00000362134.1", "ENST00000385245.1", "ENST00000385045.1", "ENST00000362117.1", "ENST00000384832.1", "ENST00000579846.3")
 #'     )
 #' }
