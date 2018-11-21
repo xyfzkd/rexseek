@@ -1,10 +1,38 @@
 testthat::context('Testing normalization')
 if (basename(getwd()) == 'testthat') setwd('../..')
 
+
+# norm_mat ------------------------------------
+
+testthat::test_that('norm_mat() check args', {
+	testthat::expect_error(
+		norm_mat(tempfile(), 'CPM_top'),
+		'top_n must be specified for CPM_top method'
+	)
+	testthat::expect_error(
+		norm_mat(tempfile(), 'CPM_rm'),
+		'rm_gene_type must be specified for CPM_rm method'
+	)
+	testthat::expect_error(
+		norm_mat(tempfile(), 'CPM_refer'),
+		'refer_gene_id must be specified for CPM_refer method'
+	)
+})
+
+
+
+# SCnorm ----------------------
+testthat::test_that('norm_SCnorm()', {
+	mat_SCnorm <- suppressMessages(norm_SCnorm(sim_mat*10))
+
+	testthat::expect_true(is.matrix(mat_SCnorm))
+	testthat::expect_identical(dim(mat_SCnorm), dim(sim_mat))
+})
+
 # norm_tmm ----------------------
 testthat::test_that('norm_tmm()', {
 	mat_tmm <- norm_tmm(sim_mat)
-
+norm_SCnorm(sim_mat*10)
 	testthat::expect_true(is.matrix(mat_tmm))
 	testthat::expect_identical(dim(mat_tmm), dim(sim_mat))
 })
@@ -70,6 +98,7 @@ testthat::test_that('norm_cpm_refer()', {
 
 
 testthat::test_that('norm_cpm_refer()', {
+	# test only one reference gene
 	norm_cpm_refer(sim_mat, rownames(sim_mat)[1])
 
 	testthat::expect_error(

@@ -11,16 +11,16 @@ norm_cpm(mat)
 
 norm_cpm_top(mat, top_n)
 
-norm_cpm_rm(mat, transcript_type)
+norm_cpm_rm(mat, gene_type)
 
-norm_cpm_refer(mat, reference_transcript_id)
+norm_cpm_refer(mat, refer_gene_id)
 }
 \arguments{
-\item{mat}{integer matrix. counts. first part (separated by \code{|}) of row names must be transcript id}
+\item{mat}{integer matrix. counts.}
 
-\item{transcript_type}{character.}
+\item{gene_type}{character.}
 
-\item{reference_transcript_id}{character.}
+\item{refer_gene_id}{character.}
 }
 \description{
 CPM normalization
@@ -39,3 +39,7 @@ some functions may throw errors
 \item \code{norm_cpm_refer}: normalize by of given reference genes
 }}
 
+\examples{
+norm_cpm_refer(sim_mat, suggest_refer$id)
+
+}

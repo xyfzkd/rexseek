@@ -1,0 +1,80 @@
+---
+title: "matrix processing"
+author: "Zhuoer Dong"
+date: "November 6, 2018"
+output: html_document
+params: 
+    mat
+---
+
+```{r knitr-setup, include=FALSE}
+knitr::opts_chunk$set(echo = F, error = T)
+```
+
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+
+```{r read-data}
+mat_raw <- 'data-raw/external/scirep_sequential_qc.txt' %>% rexseek::read_mat()
+sample_class <- 'data-raw/external/scirep_classes.txt' %>% readr::read_csv(T, 'cc') 
+```
+
+# orignial matrix
+
+```{r show-original}
+mat_raw[1:10, 1:6]
+```
+
+# filter low-expressed genes
+
+```{r filter-low}
+mat <- mat_raw %>% rexseek::filter_low()
+```
+
+```{r show-filter}
+mat[1:10, 1:6]
+```
+
+# Show highest expressed genes
+
+```{r plot-highest-exprs}
+rexseek::as_SingleCellExperiment(mat, col_data = sample_class) %>%
+	rexseek::plot_highest_exprs()
+```
+
+
+# normalization
+
+```{r include=TRUE, results='asis'}
+headers <- paste0(
+	c('before', 'TMM', 'RLE', 'CPM', 'CPM top_n', 'CPM remove certain RNA type', 'CPM reference gene'), 
+	' normalization'
+)
+mat_norms <- list(
+	mat,
+	rexseek::norm_tmm(mat), 
+	rexseek::norm_rle(mat), 
+	rexseek::norm_cpm(mat), 
+	rexseek::norm_cpm_top(mat, 20), 
+	rexseek::norm_cpm_rm(mat, c('miRNA', 'piRNA')), 
+	rexseek::norm_cpm_refer(mat, rexseek::suggest_refer$id)
+)
+
+report_mat <- function(...) {
+	child_output <- knitr::knit_child(
+		system.file('rmd/norm_report_child.Rmd', package = 'rexseek'), 
+		quiet = T, options = list(params = list(...))
+	)
+	writeLines(child_output)
+}
+
+purrr::pmap(
+	list(header = headers, mat_norm = mat_norms), 
+	report_mat, 
+	sample_class = sample_class, shape = 'label', color = 'label'
+) %>% invisible()
+```
+

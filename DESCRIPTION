@@ -16,7 +16,8 @@ Imports:
     tibble,
     dplyr,
     stringr,
-    ggplot2
+    ggplot2,
+    ggrepel
 Remotes: 
     Vivianstats/scImpute,
     bioc::3.7/scater,

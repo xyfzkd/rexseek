@@ -17,6 +17,9 @@ integer matrix
 \description{
 read counts matrix
 }
+\details{
+In any case, first part (separated by \code{|}) of row names must be transcript id
+}
 \examples{
 NULL
 }

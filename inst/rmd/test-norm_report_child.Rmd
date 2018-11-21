@@ -1,0 +1,42 @@
+---
+output: html_document
+params:
+    header: 'No normalization'
+    norm_method: 'No'
+    mat_norm: !r rexseek::sim_mat
+    sample_class: !r rexseek::sim_sample_class
+    shape: label
+    color: label
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, fig.align='center')
+```
+
+# `r params$header`
+
+normalized data
+
+```{r}
+params$mat_norm[1:10, 1:6]
+```
+
+
+```{r}
+if (is.null(params$sample_class)) {
+	reads <- rexseek::as_SingleCellExperiment(params$mat_norm)
+} else {
+	reads <- rexseek::as_SingleCellExperiment(params$mat_norm, params$sample_class)
+}
+```
+
+```{r fig.cap='PCA plot'}
+reads %>% rexseek::plot_PCA(shape = params$shape, color = params$color)
+```
+
+```{r fig.cap='TSNE plot'}
+reads %>% rexseek::plot_TSNE(shape = params$shape, color = params$color)
+```
+
+

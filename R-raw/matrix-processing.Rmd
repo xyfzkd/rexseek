@@ -50,38 +50,6 @@ filename, savename, use which operation, pipeline
     - RUVs: need logged normalization matrix
     - Combat: need logged normalization matrix
 
-# load data
-
-
-```{r read-data}
-mat_raw <- 'data-raw/external/scirep_sequential_qc.txt' %>% rexseek::read_mat()
-sample_class <- 'data-raw/external/scirep_classes.txt' %>% readr::read_csv(T, 'cc') %T>% print
-```
-
-```{r filter-low-value}
-mat <- mat_raw %>% rexseek::filter_low()
-```
-
-```{r to-matrix}
-```
-
-```{r make-SingleCellExperiment}
-reads <- rexseek::as_SingleCellExperiment(mat, col_data = sample_class) %T>% print
-```
-
-
-```{r plotHighestExprs}
-reads %>% rexseek::plot_highest_exprs()
-```
-
-```{r plotPCA}
-reads %>% rexseek::plot_PCA(shape = 'label', color = 'label')
-```
-
-```{r plotTSNE}
-reads %>% rexseek::plot_TSNE(shape = 'label', color = 'label')
-```
-
 
 ```{r imputation, eval=F}
 if(FLASE) {
@@ -106,105 +74,35 @@ if(FLASE) {
 
 
 
-# normalization
-
-```{r pre-norm}
-mat %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head
-```
-
-
-```{r SCnorm}
-if (!file.exists('data-raw/mat_SCnorm.rds')) {
-	mat_SCnorm < mat %>% 
-		{SCnorm::SCnorm(., Conditions = rep(1, ncol(.)), PrintProgressPlots = T)} %>% 
-		SingleCellExperiment::normcounts()
-	readr::write_rds(mat_SCnorm, 'data-raw/mat_SCnorm.rds')
-} else
-	mat_SCnorm <- readr::read_rds('data-raw/mat_SCnorm.rds')
-
-mat_SCnorm %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head
-
-system.time(norm_SCnorm(mat[1:1000, ]*100))
-```
-
-
-```{r TMM}
-mat_tmm <- mat %>% rexseek::norm_tmm()
-
-mat_tmm %>% colMeans() %>% {./mean(.)} %>% head()
-```
-
-
-```{r RLE}
-mat_rle <-  mat %>% rexseek::norm_rle()
-
-mat_rle %>% colMeans() %>% {./mean(.)} %>% head()
-```
-
-```{r CPM}
-mat_cpm <- rexseek::norm_cpm(mat)
-
-mat_cpm %>% colMeans() %>% head()
-```
-
-```{r CPM-top}
-
-mat_cpm_top %T>% SCnorm::plotCountDepth() %>% colMeans() %>% head()
-```
-
-```{r cpm-rm}
-
-```
-
-
-
-```{r cpm-refer}
-
-```
-
-
-density plot: coefficient of variance 
-
-```{r refer-cv-density}
-coef_var_fun <- function(x) {sd(x, na.rm = T) / mean(x, na.rm = T)}
-
-coef_var_df <- mat %>% apply(1, coef_var_fun) %>% 
-	{tibble::tibble(id = names(.), value = .)}
-coef_var_refer_df <- coef_var_df %>% dplyr::filter(id %in% reference_transcript_id)
-
-ggplot2::ggplot(coef_var_df) + 
-	ggplot2::geom_density(ggplot2::aes(value), color = 'blue') + 
-	ggplot2::geom_vline(xintercept = coef_var_refer_df$value, color = 'green', size = 0.1)
-```
-
-
 ```{r refer-count-violin, fig.keep='last'}
-# violin plot: reference gene counts
-g_violin <- mat %>% {log2(. + 0.001)} %>% tibble::as_tibble(rownames = 'id') %>% 
-	dplyr::inner_join(reference_transcript, ., by = 'id') %>% dplyr::select(-id) %>%
-	tidyr::gather('sample', 'count', -1) %>% 
-	ggplot2::ggplot(ggplot2::aes(name, count)) + ggplot2::geom_violin() +
-	ggplot2::labs(x = 'reference transcripts', y = quote(log[2](count)))
-
-## dig out computed values in ggplot
-sink(tempfile())
-g_violin_df <- NULL;
-g_violin_fun <- function(x) {g_violin_df <<- tibble::as_tibble(x)}
-g_violin + gginnards::stat_debug_panel(summary.fun = g_violin_fun)
-sink()
-
-## construct tibble to label coef_var value
-g_violin_text_df <- dplyr::bind_cols(
-	g_violin_df %>% dplyr::group_by(x) %>% dplyr::arrange(dplyr::desc(y)) %>%
-		dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::arrange(x) %>% dplyr::select(x, y),
-	coef_var_refer_df %>% dplyr::inner_join(reference_transcript, ., by = 'id') %>% 
-		dplyr::arrange(name) %>% dplyr::select(value) 
-	#" note the order of `x` is matched with factor level order of `name` (in `geom_violin()`)
-	#" so we can use two `arrange()` to match the order of two tibble
-) %>% dplyr::mutate(value = formatC(value, digits = 2, format = 'f'))
-
-## final plot
-g_violin + ggplot2::geom_text(ggplot2::aes(x, y + 1, label = value), g_violin_text_df)
+if (FALSE) {
+	# violin plot: reference gene counts
+	g_violin <- mat %>% {log2(. + 0.001)} %>% tibble::as_tibble(rownames = 'id') %>% 
+		dplyr::inner_join(reference_transcript, ., by = 'id') %>% dplyr::select(-id) %>%
+		tidyr::gather('sample', 'count', -1) %>% 
+		ggplot2::ggplot(ggplot2::aes(name, count)) + ggplot2::geom_violin() +
+		ggplot2::labs(x = 'reference transcripts', y = quote(log[2](count)))
+	
+	## dig out computed values in ggplot
+	sink(tempfile())
+	g_violin_df <- NULL;
+	g_violin_fun <- function(x) {g_violin_df <<- tibble::as_tibble(x)}
+	g_violin + gginnards::stat_debug_panel(summary.fun = g_violin_fun)
+	sink()
+	
+	## construct tibble to label coef_var value
+	g_violin_text_df <- dplyr::bind_cols(
+		g_violin_df %>% dplyr::group_by(x) %>% dplyr::arrange(dplyr::desc(y)) %>%
+			dplyr::slice(1) %>% dplyr::ungroup() %>% dplyr::arrange(x) %>% dplyr::select(x, y),
+		coef_var_refer_df %>% dplyr::inner_join(reference_transcript, ., by = 'id') %>% 
+			dplyr::arrange(name) %>% dplyr::select(value) 
+		#" note the order of `x` is matched with factor level order of `name` (in `geom_violin()`)
+		#" so we can use two `arrange()` to match the order of two tibble
+	) %>% dplyr::mutate(value = formatC(value, digits = 2, format = 'f'))
+	
+	## final plot
+	g_violin + ggplot2::geom_text(ggplot2::aes(x, y + 1, label = value), g_violin_text_df)
+}
 ```
 
 

@@ -33,12 +33,14 @@ suggest_refer <- tibble::tribble(
 	dplyr::mutate(name = stringr::str_remove(full, '^[^\\|]+\\|')) %>%
 	dplyr::mutate(name = stringr::str_remove(name, '\\|[^\\|]+$')) %>% 
 	dplyr::mutate(name = stringr::str_remove(name, '-\\d+$')) %T>% print
+
 usethis::use_data(suggest_refer, overwrite = TRUE)
 ```
 
 
 ```{r rna_type}
 rna_type <-  readr::read_rds('data-raw/rna_type.rds') %T>% print
+
 usethis::use_data(rna_type, overwrite = TRUE)
 ```
 
@@ -52,7 +54,7 @@ n_sample = 50;
 sim_mat <- rpois(n_gene*n_sample, 5) %>% matrix(ncol = n_sample) %T>%
 	{colnames(.) <- paste0('Sample_', seq_len(n_sample))} %T>% 
 	{rownames(.) <- rna_type %>% 
-		dplyr::group_by(transcript_type) %>% dplyr::sample_n(n_gene, T) %>%
+		dplyr::group_by(gene_type) %>% dplyr::sample_n(n_gene, T) %>%
 		.$transcript_id %>% sample(n_gene) %>% 
 		c(suggest_refer$id) %>% unique %>% sample(n_gene)
 	} %T>% print

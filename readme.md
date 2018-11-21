@@ -21,7 +21,7 @@ Refer to this [post](https://dongzhuoer.github.io/_redirects/develop-upon-my-r-p
 
 ```r
 'data-raw/external/all.txt' %>% readr::read_tsv() %>% 
-	dplyr::select('transcript_id', 'transcript_type') %>%
+	dplyr::select('transcript_id', gene_type = 'transcript_type') %>%
     readr::write_rds('data-raw/rna_type.rds', 'xz')
 ```
 

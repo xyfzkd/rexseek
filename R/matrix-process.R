@@ -7,6 +7,8 @@
 #' @param ... other arguments passsed on to [readr::read_tsv()]
 #'
 #' @return integer matrix
+#' @details In any case, first part (separated by `|`) of row names must be transcript id
+#'
 #' @export
 #'
 #' @examples NULL
@@ -35,9 +37,9 @@ filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
 
 
 #' @export
-plot_highest_exprs <- function(sce) {
+plot_highest_exprs <- function(sce, top_n = 20) {
 	sce %>% {suppressMessages(scater::calculateQCMetrics(.))} %>%
-		scater::plotHighestExprs(n = 20)
+		scater::plotHighestExprs(n = top_n)
 }
 
 #' @title plot PCA, TSNE
@@ -65,6 +67,51 @@ plot_TSNE <- function(sce, shape = NULL, color = NULL) {
 	)
 }
 
+coef_var_fun <- function(x) {
+	sd(x, na.rm = T) / mean(x, na.rm = T)
+}
+
+
+#' Title
+#'
+#' @param mat
+#' @param refer_gene_id
+#' @param refer_gene_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+# mat = sim_mat
+# refer_gene_id = suggest_refer$id
+# refer_gene_name = suggest_refer$name
+plot_cv_density <- function(mat, refer_gene_id = '', refer_gene_name = refer_gene_id) {
+	coef_var_df <- mat %>% apply(1, coef_var_fun) %>%
+		{tibble::tibble(id = names(.), value = .)} %>%
+		dplyr::mutate(id = stringr::str_extract(id, '[^|]+'))
+	coef_var_refer_df <- tibble::tibble(id = refer_gene_id, name = refer_gene_name) %>%
+		dplyr::inner_join(coef_var_df, by = 'id')
+
+	plot <- ggplot2::ggplot(coef_var_df) +
+		ggplot2::geom_density(ggplot2::aes(value), color = 'blue')
+
+	if (nrow(coef_var_refer_df) > 0L) {
+
+		plot = plot +
+			ggplot2::geom_vline(xintercept = coef_var_refer_df$value, color = 'green') +
+			ggplot2::geom_point(
+				ggplot2::aes(x = value, y = seq_along(value)),
+				data = coef_var_refer_df, size = 2, shape = 1
+			) +
+			ggrepel::geom_label_repel(
+				ggplot2::aes(x = value, y = seq_along(value), label = name),
+				data = coef_var_refer_df, hjust = 0.5
+			)
+	}
+
+	return(plot)
+}
 
 
 

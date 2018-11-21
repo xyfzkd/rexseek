@@ -32,6 +32,16 @@ testthat::test_that('filter_low()', {
 
 
 
+testthat::test_that('plot_highest_exprs()', {
+	testthat::expect_true(T);
+
+	# test `top_n` > `nrow(mat)`
+	as_SingleCellExperiment(sim_mat[1:10,]) %>% plot_highest_exprs()
+
+	as_SingleCellExperiment(sim_mat[1:10,]) %>% plot_highest_exprs()
+});
+
+
 testthat::test_that('plot_PCA()', {
 	testthat::expect_true(T);
 
@@ -50,4 +60,29 @@ testthat::test_that('plot_TSNE()', {
 	as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_TSNE(shape = 'label')
 	as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_TSNE(color = 'label')
 });
+
+
+
+
+testthat::test_that('coef_var_fun()', {
+	set.seed(0)
+
+	testthat::expect_equal(coef_var_fun(rnorm(5)), 0.9238771)
+	testthat::expect_equal(coef_var_fun(rpois(5, 4)), 0.5832981)
+});
+
+
+
+testthat::test_that('plot_cv_density()', {
+	testthat::expect_true(T);
+
+	plot_cv_density(sim_mat, suggest_refer$id, suggest_refer$name)
+	plot_cv_density(sim_mat, suggest_refer$id) #
+	plot_cv_density(sim_mat, rownames(sim_mat)[1:6])
+});
+
+
+# refer_gene_id =
+# refer_gene_name =
+
 
