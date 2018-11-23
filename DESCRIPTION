@@ -17,7 +17,11 @@ Imports:
     dplyr,
     stringr,
     ggplot2,
-    ggrepel
+    ggrepel,
+    scImpute,
+    scater,
+    SingleCellExperiment,
+    SCnorm
 Remotes: 
     Vivianstats/scImpute,
     bioc::3.7/scater,
