@@ -9,7 +9,9 @@ filter_low(mat, min_count = 2, min_sample_per_gene = 5)
 \arguments{
 \item{mat}{integer matrix.}
 
-\item{min_count, }{min_sample_per_gene integer scalar. For each gene, it must contain at least \code{min_count} reads in at least \code{min_sample_per_gene} samples. Otherwise, it would be dropped.}
+\item{min_count, }{min_sample_per_gene integer scalar. For each gene, it must
+contain at least \code{min_count} reads in at least \code{min_sample_per_gene}
+samples. Otherwise, it would be dropped.}
 }
 \value{
 integer matrix.
@@ -18,5 +20,6 @@ integer matrix.
 filter genes with low expression values
 }
 \examples{
-NULL
+filter_low(sim_mat)
+
 }

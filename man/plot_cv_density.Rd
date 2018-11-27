@@ -2,14 +2,25 @@
 % Please edit documentation in R/matrix-process.R
 \name{plot_cv_density}
 \alias{plot_cv_density}
-\title{Title}
+\title{density plot of coefficient of variation}
 \usage{
 plot_cv_density(mat, refer_gene_id = "",
   refer_gene_name = refer_gene_id)
 }
 \arguments{
-\item{refer_gene_name}{}
+\item{mat}{integer matrix. counts}
+
+\item{refer_gene_id}{character.}
+
+\item{refer_gene_name}{character.}
+}
+\value{
+\code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
 }
 \description{
-Title
+density plot of coefficient of variation
+}
+\examples{
+NULL
+
 }

@@ -4,7 +4,7 @@
 \alias{norm_scater}
 \alias{norm_tmm}
 \alias{norm_rle}
-\title{TMM/RLE normalization}
+\title{TMM/RLE normalization by scater package}
 \usage{
 norm_tmm(mat)
 
@@ -14,12 +14,15 @@ norm_rle(mat)
 \item{mat}{integer matrix. counts}
 }
 \description{
-TMM/RLE normalization
+TMM/RLE normalization by scater package
 }
-\section{Functions}{
-\itemize{
-\item \code{norm_tmm}: TMM normalization
+\details{
+\code{norm_tmm()} performs TMM normalization
 
-\item \code{norm_rle}: RLE normalization
-}}
-
+\code{norm_rle()} performs RLE normalization
+}
+\seealso{
+Other matrix normalization: \code{\link{norm_SCnorm}},
+  \code{\link{norm_cpm}}
+}
+\concept{matrix normalization}

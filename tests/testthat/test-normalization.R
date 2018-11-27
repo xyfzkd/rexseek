@@ -45,9 +45,9 @@ testthat::test_that('norm_rle()', {
 	testthat::expect_identical(dim(mat_rle), dim(sim_mat))
 })
 
-# norm_cpm ----------------------
-testthat::test_that('norm_cpm()', {
-	mat_cpm <- norm_cpm(sim_mat)
+# norm_cpm_total ----------------------
+testthat::test_that('norm_cpm_total()', {
+	mat_cpm <- norm_cpm_total(sim_mat)
 
 	testthat::expect_true(is.matrix(mat_cpm))
 	testthat::expect_identical(dim(mat_cpm), dim(sim_mat))

@@ -1,4 +1,9 @@
-norm_mat_check_arg <- function(norm_methods, top_n, rm_gene_type, refer_gene_id) {
+fix_low <- function(min_count = 2, min_sample_per_gene = 5, highest_exprs_top_n = 20) {
+	filter_low()
+	imputation()
+}
+
+normalize_check_arg <- function(norm_methods, top_n, rm_gene_type, refer_gene_id) {
 	if ('CPM_top' %in% norm_methods && is.null(top_n))
 		stop('top_n must be specified for CPM_top method')
 
@@ -10,24 +15,24 @@ norm_mat_check_arg <- function(norm_methods, top_n, rm_gene_type, refer_gene_id)
 
 }
 
-norm_mat_rmd <- function() {
-
-}
-
-#' @example
+#' @title martix normalization
+#' @examples
 #' \donotrun{
+#'     refer_gene_id = c(
+#'         "ENST00000408438.1", "ENST00000385271.1", "ENST00000607334.3",
+#'         "ENST00000385059.1", "ENST00000362134.1", "ENST00000385245.1",
+#'         "ENST00000385045.1", "ENST00000362117.1", "ENST00000384832.1",
+#'         "ENST00000579846.3"
+#'     )
 #'     norm_mat(
 #'         '/path/to/matrix', c('SCnorm', 'TMM', 'RLE', 'CPM', 'CPM_top', 'CPM_rm', 'CPM_refer'),
-#'         top_n = 20, rm_gene_type = c('miRNA', 'piRNA'), refer_gene_id = c("ENST00000408438.1", "ENST00000385271.1", "ENST00000607334.3", "ENST00000385059.1", "ENST00000362134.1", "ENST00000385245.1", "ENST00000385045.1", "ENST00000362117.1", "ENST00000384832.1", "ENST00000579846.3")
+#'         top_n = 20L, rm_gene_type = c('miRNA', 'piRNA'), refer_gene_id = refer_gene_id
 #'     )
 #' }
-#' @export
-norm_mat <- function(
+normalize <- function(
 	counts_mat_path,
 	norm_methods = c('SCnorm', 'TMM', 'RLE', 'CPM', 'CPM_top', 'CPM_rm', 'CPM_refer'),
 	top_n = NULL, rm_gene_type = NULL, refer_gene_id = NULL,
-	min_count = 2, min_sample_per_gene = 5,
-	highest_exprs_top_n = 20,
 	sample_class_path = NULL, PCA_label_by = NULL, PAC_color_by = NULL,
 	refer_gene_name = refer_gene_id,
 	output_dir = '.', output_file = 'norm'
@@ -63,21 +68,35 @@ norm_mat <- function(
 
 
 
-
-#' @export
-norm_SCnorm <- function(mat, ...) {
-	mat %>% {suppressMessages(SCnorm::SCnorm(Conditions = rep(1, ncol(.)), Data = ., ...))} %>%
-		SingleCellExperiment::normcounts()
-}
-
-#' @title TMM/RLE normalization
+#' @title SCnorm normalization
 #'
 #' @param mat integer matrix. counts
+#' @param ... other arguments passed on to [SCnorm::SCnorm()]
+#'
+#' @family matrix normalization
+#'
+#' @export
+norm_SCnorm <- function(mat, ...) {
+	Conditions = rep(1, ncol(mat));
+	sce <- suppressMessages(SCnorm::SCnorm(mat, Conditions, ...));
+	SingleCellExperiment::normcounts(sce)
+}
+
+# norm_scater ------------------
+
+#' @title TMM/RLE normalization by scater package
+#'
+#' @param mat integer matrix. counts
+#'
+#' @family matrix normalization
+#'
 #' @name norm_scater
 NULL
 
 
-#' @describeIn norm_scater TMM normalization
+#' @rdname  norm_scater
+#'
+#' @details `norm_tmm()` performs TMM normalization
 #'
 #' @export
 norm_tmm <- function(mat) {
@@ -86,7 +105,11 @@ norm_tmm <- function(mat) {
 		scater::normalise() %>% SingleCellExperiment::normcounts()
 }
 
-#' @describeIn norm_scater RLE normalization
+
+#' @rdname  norm_scater
+#'
+#' @details `norm_rle()` performs RLE normalization
+#'
 #' @export
 norm_rle <- function(mat) {
 	mat %>% as_SingleCellExperiment() %>%
@@ -95,32 +118,53 @@ norm_rle <- function(mat) {
 }
 
 
+# norm_cpm ------------------
+
+#' @title CPM normalization by some genes
+#'
 #' @param mat integer matrix. counts
 #' @param row integer or logical. Use which rows (genes) to perfrom normalization
 norm_cpm_impl <- function(mat, row) {
 	t(t(mat*1e6) / colSums(mat[row, , drop = F], na.rm = T))
 }
 
-# norm_cpm ------------------
+
 #' @title CPM normalization
 #'
 #' @param mat integer matrix. counts.
 #'
 #' @details some functions may throw errors
 #'
+#' @family matrix normalization
+#'
 #' @name norm_cpm
 NULL
 
 
-#' @describeIn norm_cpm normalize by all genes
+
+#' @rdname norm_cpm
+#'
+#' @details `norm_cpm_total()` uses counts sum of all genes as normalization factor
+#'
+#' @examples
+#' norm_cpm_total(sim_mat)
+#'
 #' @export
-norm_cpm <- function(mat) {
+norm_cpm_total <- function(mat) {
 	row_all <- nrow(mat) %>% seq_len()
 
 	norm_cpm_impl(mat, row_all)
 }
 
-#' @describeIn norm_cpm normalize by top k genes sorted by expression level
+#' @rdname norm_cpm
+#'
+#' @param top_n integer scalar. see `norm_cpm_top()` below
+#'
+#' @details `norm_cpm_top()` uses counts sum of top 20 genes as normalization factor (assuming `top_n = 20L`)
+#'
+#' @examples
+#' norm_cpm_top(sim_mat, 20L)
+#'
 #' @export
 norm_cpm_top <- function(mat, top_n) {
 	if (nrow(mat) < top_n)
@@ -133,8 +177,14 @@ norm_cpm_top <- function(mat, top_n) {
 }
 
 
-#' @describeIn norm_cpm normalize by removing genes of given type (such as piRNAs)
-#' @param gene_type character.
+#' @rdname norm_cpm
+#'
+#' @param gene_type character. see `norm_cpm_rm()` below
+#'
+#' @details `norm_cpm_rm()` uses counts sum of non-piRNA genes as normalization factor (assuming `gene_type = 'piRNA'`)
+#'
+#' @examples
+#' norm_cpm_rm(sim_mat, c('miRNA', 'piRNA'))
 #'
 #' @export
 norm_cpm_rm <- function(mat, gene_type) {
@@ -151,9 +201,11 @@ norm_cpm_rm <- function(mat, gene_type) {
 
 
 
-#' @describeIn norm_cpm normalize by of given reference genes
+#' @rdname norm_cpm
 #'
-#' @param refer_gene_id character.
+#' @param refer_gene_id character. Ensembl transcript id, see `norm_cpm_refer()` below
+#'
+#' @details `norm_cpm_refer()` uses counts sum of given reference genes as normalization factor
 #'
 #' @examples
 #' norm_cpm_refer(sim_mat, suggest_refer$id)

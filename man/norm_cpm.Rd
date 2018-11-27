@@ -2,12 +2,13 @@
 % Please edit documentation in R/normalization.R
 \name{norm_cpm}
 \alias{norm_cpm}
+\alias{norm_cpm_total}
 \alias{norm_cpm_top}
 \alias{norm_cpm_rm}
 \alias{norm_cpm_refer}
 \title{CPM normalization}
 \usage{
-norm_cpm(mat)
+norm_cpm_total(mat)
 
 norm_cpm_top(mat, top_n)
 
@@ -18,28 +19,38 @@ norm_cpm_refer(mat, refer_gene_id)
 \arguments{
 \item{mat}{integer matrix. counts.}
 
-\item{gene_type}{character.}
+\item{top_n}{integer scalar. see \code{norm_cpm_top()} below}
 
-\item{refer_gene_id}{character.}
+\item{gene_type}{character. see \code{norm_cpm_rm()} below}
+
+\item{refer_gene_id}{character. Ensembl transcript id, see \code{norm_cpm_refer()} below}
 }
 \description{
 CPM normalization
 }
 \details{
 some functions may throw errors
+
+\code{norm_cpm_total()} uses counts sum of all genes as normalization factor
+
+\code{norm_cpm_top()} uses counts sum of top 20 genes as normalization factor (assuming \code{top_n = 20L})
+
+\code{norm_cpm_rm()} uses counts sum of non-piRNA genes as normalization factor (assuming \code{gene_type = 'piRNA'})
+
+\code{norm_cpm_refer()} uses counts sum of given reference genes as normalization factor
 }
-\section{Functions}{
-\itemize{
-\item \code{norm_cpm}: normalize by all genes
-
-\item \code{norm_cpm_top}: normalize by top k genes sorted by expression level
-
-\item \code{norm_cpm_rm}: normalize by removing genes of given type (such as piRNAs)
-
-\item \code{norm_cpm_refer}: normalize by of given reference genes
-}}
-
 \examples{
+norm_cpm_total(sim_mat)
+
+norm_cpm_top(sim_mat, 20L)
+
+norm_cpm_rm(sim_mat, c('miRNA', 'piRNA'))
+
 norm_cpm_refer(sim_mat, suggest_refer$id)
 
 }
+\seealso{
+Other matrix normalization: \code{\link{norm_SCnorm}},
+  \code{\link{norm_scater}}
+}
+\concept{matrix normalization}

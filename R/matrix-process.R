@@ -7,11 +7,13 @@
 #' @param ... other arguments passsed on to [readr::read_tsv()]
 #'
 #' @return integer matrix
-#' @details In any case, first part (separated by `|`) of row names must be transcript id
+#'
+#' @details In any case, first part (separated by `|`) of row names must be
+#'   Ensembl transcript id
 #'
 #' @export
-#'
-#' @examples NULL
+
+# path = 'data-raw/external/scirep_sequential_qc.txt'
 read_mat <- function(path, ...) {
 	path %>% readr::read_tsv(T, readr::cols(.default = 'c'), ...) %>%
 		dplyr::mutate_at(-1, readr::parse_integer) %>%
@@ -22,12 +24,16 @@ read_mat <- function(path, ...) {
 #' @title filter genes with low expression values
 #'
 #' @param mat integer matrix.
-#' @param min_count, min_sample_per_gene integer scalar. For each gene, it must contain at least `min_count` reads in at least `min_sample_per_gene` samples. Otherwise, it would be dropped.
+#' @param min_count, min_sample_per_gene integer scalar. For each gene, it must
+#'   contain at least `min_count` reads in at least `min_sample_per_gene`
+#'   samples. Otherwise, it would be dropped.
 #'
 #' @return integer matrix.
-#' @export
 #'
-#' @examples NULL
+#' @examples
+#' filter_low(sim_mat)
+#'
+#' @export
 filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
 	low_per_row <- rowSums(mat > min_count)
 	keeped_row <- low_per_row > min_sample_per_gene
@@ -42,46 +48,68 @@ plot_highest_exprs <- function(sce, top_n = 20) {
 		scater::plotHighestExprs(n = top_n)
 }
 
-#' @title plot PCA, TSNE
-#'
-#' @param sce A SingleCellExperiment object.
-#' @param shape, color string. specify a column in `col_data` of [as_SingleCellExperiment()] to shape/color by
-#'
-#' @export
-plot_PCA <- function(sce, shape = NULL, color = NULL) {
-	sce %>% scater::plotPCA(
+
+# plot_group --------------
+
+plot_group_impl <- function(sce, shape = NULL, color = NULL, plot_fun) {
+ 	plot_fun(
+ 		sce,
 		shape_by = shape, colour_by = color,
     	run_args = list(exprs_values = 'counts')
 	)
 }
 
+#' @title plot PCA, TSNE
+#'
+#' @param sce A SingleCellExperiment object.
+#' @param shape, color string. specify a column in `col_data` of [as_SingleCellExperiment()] to shape/color by
+#'
+#' @name plot_group
+NULL
 
 
-#' @describeIn plot_PCA
+#' @rdname plot_group
+#'
+#' @examples
+#' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA('label', 'label')
+#'
+#' @export
+plot_PCA <- function(sce, shape = NULL, color = NULL) {
+	plot_group(sce, shape, color, scater::plotPCA)
+}
+
+
+
+#' @rdname plot_group
+#'
+#' @examples
+#' as_SingleCellExperiment(sim_mat) %>% plot_TSNE()
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_TSNE('label', 'label')
 #'
 #' @export
 plot_TSNE <- function(sce, shape = NULL, color = NULL) {
-	sce %>% scater::plotTSNE(
-	    shape_by = shape, colour_by = color,
-	    run_args = list(exprs_values = "counts")
-	)
+	plot_group(sce, shape, color, scater::plotTSNE)
 }
+
+# plot CV -------------------------
 
 coef_var_fun <- function(x) {
 	sd(x, na.rm = T) / mean(x, na.rm = T)
 }
 
 
-#' Title
+#' @title density plot of coefficient of variation
 #'
-#' @param mat
-#' @param refer_gene_id
-#' @param refer_gene_name
+#' @param mat integer matrix. counts
+#' @param refer_gene_id character.
+#' @param refer_gene_name character.
 #'
-#' @return
+#' @return [ggplot2::ggplot()] object
+#'
+#' @examples NULL
+#'
 #' @export
-#'
-#' @examples
 
 # mat = sim_mat
 # refer_gene_id = suggest_refer$id
