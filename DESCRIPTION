@@ -18,6 +18,7 @@ Imports:
     stringr,
     ggplot2,
     ggrepel,
+    Rtsne,
     scImpute,
     scater,
     SingleCellExperiment,
