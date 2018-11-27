@@ -2,19 +2,19 @@ testthat::context('Testing normalization')
 if (basename(getwd()) == 'testthat') setwd('../..')
 
 
-# norm_mat ------------------------------------
+# normalize ------------------------------------
 
-testthat::test_that('norm_mat() check args', {
+testthat::test_that('normalize() check args', {
 	testthat::expect_error(
-		norm_mat(tempfile(), 'CPM_top'),
+		normalize(tempfile(), 'CPM_top'),
 		'top_n must be specified for CPM_top method'
 	)
 	testthat::expect_error(
-		norm_mat(tempfile(), 'CPM_rm'),
+		normalize(tempfile(), 'CPM_rm'),
 		'rm_gene_type must be specified for CPM_rm method'
 	)
 	testthat::expect_error(
-		norm_mat(tempfile(), 'CPM_refer'),
+		normalize(tempfile(), 'CPM_refer'),
 		'refer_gene_id must be specified for CPM_refer method'
 	)
 })

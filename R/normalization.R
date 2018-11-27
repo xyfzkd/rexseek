@@ -37,7 +37,7 @@ normalize <- function(
 	refer_gene_name = refer_gene_id,
 	output_dir = '.', output_file = 'norm'
 ) {
-	norm_mat_check_arg(norm_methods, top_n, rm_gene_type, refer_gene_id)
+	normalize_check_arg(norm_methods, top_n, rm_gene_type, refer_gene_id)
 	mat <- read_mat(counts_mat_path) %>% filter_low(min_count, min_sample_per_gene)
 
 	if ('SCnorm' %in% norm_methods)    mat_SCnorm <- norm_SCnorm(mat)
