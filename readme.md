@@ -11,6 +11,10 @@ if (!requireNamespace("remotes")) install.packages('remotes');
 remotes::install_github('dongzhuoer/rexseek');
 ```
 
+## Usage
+
+For Students in Lu Lab, please refer to [this guide](https://github.com/dongzhuoer/lulab-rotation-summary/blob/master/exseek.md)
+
 ## develop
 
 Refer to this [post](https://dongzhuoer.github.io/_redirects/develop-upon-my-r-package.html)
