@@ -73,6 +73,9 @@ normalize <- function(
 #' @param mat integer matrix. counts
 #' @param ... other arguments passed on to [SCnorm::SCnorm()]
 #'
+#' @examples
+#' norm_SCnorm(sim_mat*10)
+#'
 #' @family matrix normalization
 #'
 #' @export
@@ -98,6 +101,9 @@ NULL
 #'
 #' @details `norm_tmm()` performs TMM normalization
 #'
+#' @examples
+#' norm_tmm(sim_mat)
+#'
 #' @export
 norm_tmm <- function(mat) {
 	mat %>% as_SingleCellExperiment() %>%
@@ -109,6 +115,9 @@ norm_tmm <- function(mat) {
 #' @rdname  norm_scater
 #'
 #' @details `norm_rle()` performs RLE normalization
+#'
+#' @examples
+#' norm_rle(sim_mat)
 #'
 #' @export
 norm_rle <- function(mat) {

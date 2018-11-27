@@ -21,6 +21,12 @@ TMM/RLE normalization by scater package
 
 \code{norm_rle()} performs RLE normalization
 }
+\examples{
+norm_tmm(sim_mat)
+
+norm_rle(sim_mat)
+
+}
 \seealso{
 Other matrix normalization: \code{\link{norm_SCnorm}},
   \code{\link{norm_cpm}}

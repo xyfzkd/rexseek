@@ -14,6 +14,10 @@ norm_SCnorm(mat, ...)
 \description{
 SCnorm normalization
 }
+\examples{
+norm_SCnorm(sim_mat)
+
+}
 \seealso{
 Other matrix normalization: \code{\link{norm_cpm}},
   \code{\link{norm_scater}}

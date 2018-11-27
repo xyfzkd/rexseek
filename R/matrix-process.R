@@ -76,7 +76,7 @@ NULL
 #'
 #' @export
 plot_PCA <- function(sce, shape = NULL, color = NULL) {
-	plot_group(sce, shape, color, scater::plotPCA)
+	plot_group_impl(sce, shape, color, scater::plotPCA)
 }
 
 
@@ -89,7 +89,7 @@ plot_PCA <- function(sce, shape = NULL, color = NULL) {
 #'
 #' @export
 plot_TSNE <- function(sce, shape = NULL, color = NULL) {
-	plot_group(sce, shape, color, scater::plotTSNE)
+	plot_group_impl(sce, shape, color, scater::plotTSNE)
 }
 
 # plot CV -------------------------

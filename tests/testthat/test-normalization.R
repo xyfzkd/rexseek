@@ -21,7 +21,7 @@ testthat::test_that('norm_mat() check args', {
 
 
 
-# SCnorm ----------------------
+# norm_SCnorm ----------------------
 testthat::test_that('norm_SCnorm()', {
 	mat_SCnorm <- suppressMessages(norm_SCnorm(sim_mat*10))
 
