@@ -20,9 +20,17 @@ plot PCA, TSNE
 }
 \examples{
 as_SingleCellExperiment(sim_mat) \%>\% plot_PCA()
-as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA('label', 'label')
 
-as_SingleCellExperiment(sim_mat) \%>\% plot_TSNE()
-as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_TSNE('label', 'label')
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA()
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(shape = 'label')
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(color = 'label')
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(shape = 'label', color = 'label')
+
+as_SingleCellExperiment(sim_mat) \%>\% plot_PCA()
+
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA()
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(shape = 'label')
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(color = 'label')
+as_SingleCellExperiment(sim_mat, sim_sample_class) \%>\% plot_PCA(shape = 'label', color = 'label')
 
 }

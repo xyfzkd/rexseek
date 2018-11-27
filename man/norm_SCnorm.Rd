@@ -15,7 +15,7 @@ norm_SCnorm(mat, ...)
 SCnorm normalization
 }
 \examples{
-norm_SCnorm(sim_mat)
+norm_SCnorm(sim_mat*10)
 
 }
 \seealso{
