@@ -9,16 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE, cache = F, error = T)
 ```
 
-https://github.com/lulab/exSeek-dev/blob/master/docs/matrix_processing.md
-http://166.111.156.58:8000/jupyter/user/zhuoer/notebooks/exseek/jupyter/matrix_processing.ipynb
-
-# to do:
-
-- use small makrdown to save plot
-- check dimension after each step
-
-```{r message=FALSE}
-```
 
 # To Do
 - 使用哪两类/多类样本
