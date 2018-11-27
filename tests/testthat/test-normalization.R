@@ -66,7 +66,7 @@ testthat::test_that('norm_cpm_top() error', {
 
 	testthat::expect_error(
 		norm_cpm_top(sim_mat, nrow(sim_mat) + 1),
-		'two few feature for CPM top k normalization'
+		'too few feature for CPM top n normalization'
 	)
 })
 
@@ -103,7 +103,7 @@ testthat::test_that('norm_cpm_refer()', {
 
 	testthat::expect_error(
 		norm_cpm_refer(sim_mat, 'non-exist-RNA'),
-		'can\'t find any reference transcript in the matrix for CPM normalization'
+		'can\'t find any reference genes in the matrix for CPM normalization'
 	)
 })
 

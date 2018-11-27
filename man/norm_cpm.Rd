@@ -26,18 +26,18 @@ norm_cpm_refer(mat, refer_gene_id)
 \item{refer_gene_id}{character. Ensembl transcript id, see \code{norm_cpm_refer()} below}
 }
 \description{
-CPM normalization
+CPM normalization using counts sum of \emph{certain} genes as normalization factor
 }
 \details{
 some functions may throw errors
 
-\code{norm_cpm_total()} uses counts sum of all genes as normalization factor
+\code{norm_cpm_total()} uses total genes
 
-\code{norm_cpm_top()} uses counts sum of top 20 genes as normalization factor (assuming \code{top_n = 20L})
+\code{norm_cpm_top()} uses top 20 genes (assuming \code{top_n = 20L})
 
-\code{norm_cpm_rm()} uses counts sum of non-piRNA genes as normalization factor (assuming \code{gene_type = 'piRNA'})
+\code{norm_cpm_rm()} uses non-piRNA genes (assuming \code{gene_type = 'piRNA'})
 
-\code{norm_cpm_refer()} uses counts sum of given reference genes as normalization factor
+\code{norm_cpm_refer()} uses given reference genes
 }
 \examples{
 norm_cpm_total(sim_mat)

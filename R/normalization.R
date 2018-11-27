@@ -132,13 +132,15 @@ norm_rle <- function(mat) {
 #' @title CPM normalization by some genes
 #'
 #' @param mat integer matrix. counts
-#' @param row integer or logical. Use which rows (genes) to perfrom normalization
+#' @param row integer or logical. Use which rows (genes) as normalization factor
 norm_cpm_impl <- function(mat, row) {
 	t(t(mat*1e6) / colSums(mat[row, , drop = F], na.rm = T))
 }
 
 
 #' @title CPM normalization
+#' 
+#' @description CPM normalization using counts sum of _certain_ genes as scaling factor
 #'
 #' @param mat integer matrix. counts.
 #'
@@ -153,7 +155,7 @@ NULL
 
 #' @rdname norm_cpm
 #'
-#' @details `norm_cpm_total()` uses counts sum of all genes as normalization factor
+#' @details `norm_cpm_total()` uses total genes
 #'
 #' @examples
 #' norm_cpm_total(sim_mat)
@@ -169,7 +171,7 @@ norm_cpm_total <- function(mat) {
 #'
 #' @param top_n integer scalar. see `norm_cpm_top()` below
 #'
-#' @details `norm_cpm_top()` uses counts sum of top 20 genes as normalization factor (assuming `top_n = 20L`)
+#' @details `norm_cpm_top()` uses top 20 genes sorted by counts (assuming `top_n = 20L`)
 #'
 #' @examples
 #' norm_cpm_top(sim_mat, 20L)
@@ -177,7 +179,7 @@ norm_cpm_total <- function(mat) {
 #' @export
 norm_cpm_top <- function(mat, top_n) {
 	if (nrow(mat) < top_n)
-		stop('two few feature for CPM top k normalization')
+		stop('too few feature for CPM top n normalization')
 
 	row_top <-  mat %>% rowSums() %>% sort(decreasing = T, index.return = T) %>%
 		 {.$ix[seq_len(top_n)]}
@@ -190,7 +192,7 @@ norm_cpm_top <- function(mat, top_n) {
 #'
 #' @param gene_type character. see `norm_cpm_rm()` below
 #'
-#' @details `norm_cpm_rm()` uses counts sum of non-piRNA genes as normalization factor (assuming `gene_type = 'piRNA'`)
+#' @details `norm_cpm_rm()` uses non-piRNA genes (assuming `gene_type = 'piRNA'`)
 #'
 #' @examples
 #' norm_cpm_rm(sim_mat, c('miRNA', 'piRNA'))
@@ -214,7 +216,7 @@ norm_cpm_rm <- function(mat, gene_type) {
 #'
 #' @param refer_gene_id character. Ensembl transcript id, see `norm_cpm_refer()` below
 #'
-#' @details `norm_cpm_refer()` uses counts sum of given reference genes as normalization factor
+#' @details `norm_cpm_refer()` uses given reference genes
 #'
 #' @examples
 #' norm_cpm_refer(sim_mat, suggest_refer$id)
@@ -227,7 +229,7 @@ norm_cpm_refer <- function(mat, refer_gene_id) {
 	row_refer <- mat %>% rownames() %>% stringr::str_extract('[^|]+') %>%
 		{. %in% refer_gene_id}
 	if (!any(row_refer))
-		stop('can\'t find any reference transcript in the matrix for CPM normalization')
+		stop('can\'t find any reference genes in the matrix for CPM normalization')
 
 	norm_cpm_impl(mat, row_refer)
 }

@@ -9,7 +9,7 @@ norm_cpm_impl(mat, row)
 \arguments{
 \item{mat}{integer matrix. counts}
 
-\item{row}{integer or logical. Use which rows (genes) to perfrom normalization}
+\item{row}{integer or logical. Use which rows (genes) as normalization factor}
 }
 \description{
 CPM normalization by some genes
