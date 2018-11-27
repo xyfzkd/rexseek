@@ -72,7 +72,11 @@ NULL
 #'
 #' @examples
 #' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
-#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA('label', 'label')
+#' 
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label', color = 'label')
 #'
 #' @export
 plot_PCA <- function(sce, shape = NULL, color = NULL) {
@@ -84,8 +88,12 @@ plot_PCA <- function(sce, shape = NULL, color = NULL) {
 #' @rdname plot_group
 #'
 #' @examples
-#' as_SingleCellExperiment(sim_mat) %>% plot_TSNE()
-#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_TSNE('label', 'label')
+#' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
+#' 
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')
+#' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label', color = 'label')
 #'
 #' @export
 plot_TSNE <- function(sce, shape = NULL, color = NULL) {
