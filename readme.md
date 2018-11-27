@@ -7,8 +7,8 @@ R package for matrix processing in the exSeek project
 ## Install
 
 ```r
-if (!requireNamespace("devtools")) install.packages('devtools');
-devtools::install_github('dongzhuoer/rexseek');
+if (!requireNamespace("remotes")) install.packages('remotes');
+remotes::install_github('dongzhuoer/rexseek');
 ```
 
 ## develop
