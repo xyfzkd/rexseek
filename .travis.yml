@@ -5,7 +5,8 @@ matrix:
     - language: generic
       services: docker
     - os: osx
-    - r: oldrel
+    # scater requires R >= 3.5
+    #- r: oldrel
 cache: packages
 git:
   depth: false
