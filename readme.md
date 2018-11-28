@@ -24,7 +24,7 @@ remotes::install_github('dongzhuoer/rexseek', upgrade = F);
 
 ## Usage
 
-For Students in Lu Lab, please refer to [this guide](https://github.com/dongzhuoer/lulab-rotation-summary/blob/master/exseek.md)
+For students in Lu Lab, please refer to [this guide](https://github.com/dongzhuoer/lulab-rotation-summary/blob/master/exseek.md)
 
 ## develop
 
