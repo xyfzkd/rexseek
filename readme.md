@@ -6,9 +6,20 @@ R package for matrix processing in the exSeek project
 
 ## Install
 
+Some functions only works in Bioconductor 3.7
+
+> For Students in Lu Lab, this step is not needed (and even causes error) if you run R on cnode.
+
+```r
+if (!requireNamespace("BiocManager")) install.packages('BiocManager');
+BiocManager::install(version = '3.7', ask = F, update = F)
+```
+
+Then you can install the package
+
 ```r
 if (!requireNamespace("remotes")) install.packages('remotes');
-remotes::install_github('dongzhuoer/rexseek');
+remotes::install_github('dongzhuoer/rexseek', upgrade = F);
 ```
 
 ## Usage
