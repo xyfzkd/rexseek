@@ -22,11 +22,9 @@ before_install:
   - if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then 
         R --slave -e "date <- Sys.Date(); day <- as.integer(substr(date, 9, 10)); month <- as.integer(substr(date, 6, 7)); clean <- month %% 3L == 1L && day <= 7L; if (clean) unlink(dir(.libPaths()[1], full.names = T), recursive = T)"; 
     fi;
-install:
-  - R --slave -e "update.packages(.libPaths()[1], ask = F)";
-  - R --slave -e "if (!('devtools' %in% .packages(T))) install.packages('devtools')";
+install: R --slave -e "if (!('remotes' %in% .packages(T))) install.packages('remotes')";
 script:
-  - R --slave -e "devtools::install_local(getwd(), force= TRUE)";
+  - R --slave -e "remotes::install_local(getwd(), force = TRUE, , upgrade = FALSE)";
   - ls tests/testthat/*.R || travis_terminate 0;   # devtools::test() requires `tests/testthat` directory, but testthat::test_dir() dictate there must be a R script   
   - R --slave -e "devtools::update_packages(c('testthat', 'roxygen2'))";
   # devtools::test() loads all and report result, testthat::test_dir() exit no-zero when a test fails  
