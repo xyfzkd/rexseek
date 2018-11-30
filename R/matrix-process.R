@@ -1,15 +1,16 @@
 #matrix_path = 'data-raw/external/scirep_sequential_qc.txt'
 #classinfo_path = 'scirep_classes.txt'
 
-#' @title read counts matrix
+#' @title Read counts matrix
 #'
 #' @param path string.
-#' @param ... other arguments passsed on to [readr::read_tsv()]
+#' @param ... other arguments passsed on to [readr::read_tsv()].
 #'
-#' @return integer matrix
+#' @return integer matrix. counts.
 #'
-#' @details In any case, first part (separated by `|`) of row names must be
-#'   Ensembl transcript id
+#' @details
+#' In any case, first part (separated by `|`) of row names must be
+#' Ensembl transcript id
 #'
 #' @export
 
@@ -23,12 +24,12 @@ read_mat <- function(path, ...) {
 
 #' @title filter genes with low expression values
 #'
-#' @param mat integer matrix.
+#' @param mat integer matrix. counts.
 #' @param min_count, min_sample_per_gene integer scalar. For each gene, it must
 #'   contain at least `min_count` reads in at least `min_sample_per_gene`
 #'   samples. Otherwise, it would be dropped.
 #'
-#' @return integer matrix.
+#' @return integer matrix. counts.
 #'
 #' @examples
 #' filter_low(sim_mat)
@@ -41,7 +42,10 @@ filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
 }
 
 
-
+#' @title plot PCA, TSNE
+#'
+#' @param sce SingleCellExperiment object.
+#' @param top_n integer scalar.
 #' @export
 plot_highest_exprs <- function(sce, top_n = 20) {
 	sce %>% {suppressMessages(scater::calculateQCMetrics(.))} %>%
@@ -61,8 +65,9 @@ plot_group_impl <- function(sce, shape = NULL, color = NULL, plot_fun) {
 
 #' @title plot PCA, TSNE
 #'
-#' @param sce A SingleCellExperiment object.
-#' @param shape, color string. specify a column in `col_data` of [as_SingleCellExperiment()] to shape/color by
+#' @param sce SingleCellExperiment object.
+#' @param shape, color string. Specify a column in `col_data` of
+#'   [as_SingleCellExperiment()] to shape/color by.
 #'
 #' @name plot_group
 NULL
@@ -72,7 +77,7 @@ NULL
 #'
 #' @examples
 #' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
-#' 
+#'
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')
@@ -89,7 +94,7 @@ plot_PCA <- function(sce, shape = NULL, color = NULL) {
 #'
 #' @examples
 #' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
-#' 
+#'
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')

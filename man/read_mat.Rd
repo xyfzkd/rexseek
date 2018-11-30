@@ -2,7 +2,7 @@
 % Please edit documentation in R/matrix-process.R
 \name{read_mat}
 \alias{read_mat}
-\title{read counts matrix}
+\title{Read counts matrix}
 \usage{
 read_mat(path, ...)
 }
@@ -15,7 +15,7 @@ read_mat(path, ...)
 integer matrix
 }
 \description{
-read counts matrix
+Read counts matrix
 }
 \details{
 In any case, first part (separated by \code{|}) of row names must be
