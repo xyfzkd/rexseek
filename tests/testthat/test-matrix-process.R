@@ -68,16 +68,18 @@ testthat::test_that('coef_var_fun()', {
 });
 
 
-
+# plot_cv_density ----------------------
 testthat::test_that('plot_cv_density()', {
-	testthat::expect_true(T);
-
 	plot_cv_density(sim_mat, suggest_refer$id) # only show one which exsits in matrix
 	plot_cv_density(sim_mat, suggest_refer$id, suggest_refer$name)
 	plot_cv_density(sim_mat, rownames(sim_mat)[1:6])
+	plot_cv_density(sim_mat, rownames(sim_mat)[1:6], c(letters[1:3], rownames(sim_mat)[4:6]))
 
 	#warnings
-	plot_cv_density(sim_mat, rownames(sim_mat)[1:6], letters[1:3])
+	testthat::expect_warning(
+		plot_cv_density(sim_mat, 'non-exist-RNA'),
+		"None refer gene found in the count matrix"
+	)
 	testthat::expect_warning(
 		plot_cv_density(sim_mat, rownames(sim_mat)[1:6], letters[1:3]),
 		"Ignoring refer_gene_name, since it isn't the same length as refer_gene_id"
@@ -85,7 +87,23 @@ testthat::test_that('plot_cv_density()', {
 });
 
 
-# refer_gene_id =
-# refer_gene_name =
+# plot_refer_violin ----------------------
+testthat::test_that('plot_refer_violin()', {
+	plot_refer_violin(sim_mat, suggest_refer$id) # only show one which exsits in matrix
+	plot_refer_violin(sim_mat, suggest_refer$id, suggest_refer$name)
+	plot_refer_violin(sim_mat, rownames(sim_mat)[1:6])
+	plot_refer_violin(sim_mat, rownames(sim_mat)[1:6], c(letters[1:3], rownames(sim_mat)[4:6]))
+
+	#warnings
+	testthat::expect_warning(
+		plot_refer_violin(sim_mat, 'non-exist-RNA'),
+		"None refer gene found in the count matrix"
+	)
+	testthat::expect_warning(
+		plot_refer_violin(sim_mat, rownames(sim_mat)[1:6], letters[1:3]),
+		"Ignoring refer_gene_name, since it isn't the same length as refer_gene_id"
+	)
+});
+
 
 

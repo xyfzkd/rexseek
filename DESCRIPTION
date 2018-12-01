@@ -18,6 +18,7 @@ Imports:
     stringr,
     ggplot2,
     ggrepel,
+    gginnards,
     Rtsne,
     scImpute,
     scater,
