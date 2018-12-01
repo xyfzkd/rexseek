@@ -26,10 +26,22 @@ remotes::install_github('dongzhuoer/rexseek', upgrade = F);
 
 For students in Lu Lab, please refer to [this guide](https://github.com/dongzhuoer/lulab-rotation-summary/blob/master/exseek.md)
 
+-----------------------------------------------------
+
+The following parts are for package maintainers.
+
 ## to do
 
 1. document `as_SingleCellExperiment()`
 1. error message follow style guide
+1. add `R-raw/data-raw.Rmd` (move some Non-Git code in)
+
+## useful location
+
+
+https://github.com/lulab/exSeek-dev/blob/master/docs/matrix_processing.md
+http://166.111.156.58:8000/jupyter/user/zhuoer/notebooks/exseek/jupyter/matrix_processing.ipynb
+
 
 ## develop
 
