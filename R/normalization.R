@@ -29,6 +29,7 @@ normalize_check_arg <- function(norm_methods, top_n, rm_gene_type, refer_gene_id
 #'         top_n = 20L, rm_gene_type = c('miRNA', 'piRNA'), refer_gene_id = refer_gene_id
 #'     )
 #' }
+#' @noRd
 normalize <- function(
 	counts_mat_path,
 	norm_methods = c('SCnorm', 'TMM', 'RLE', 'CPM', 'CPM_top', 'CPM_rm', 'CPM_refer'),
@@ -137,12 +138,9 @@ norm_rle <- function(mat) {
 
 #' @title CPM normalization by some genes
 #'
-#' @param mat integer matrix. counts.
 #' @param row integer or logical. Use which rows (genes) as normalization factor.
 #'
-#' @return numerical matrix. normalized counts.
-#'
-#' @noRd
+#' @keywords internal
 norm_cpm_impl <- function(mat, row) {
 	t(t(mat*1e6) / colSums(mat[row, , drop = F], na.rm = T))
 }
@@ -154,6 +152,8 @@ norm_cpm_impl <- function(mat, row) {
 #' CPM normalization using counts sum of _certain_ genes as scaling factor.
 #'
 #' @param mat integer matrix. counts.
+#'
+#' @return numerical matrix. normalized counts.
 #'
 #' @section exception:
 #' some functions may throw errors.
