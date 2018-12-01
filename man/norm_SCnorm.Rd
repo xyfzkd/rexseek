@@ -7,9 +7,12 @@
 norm_SCnorm(mat, ...)
 }
 \arguments{
-\item{mat}{integer matrix. counts}
+\item{mat}{integer matrix. counts.}
 
-\item{...}{other arguments passed on to \code{\link[SCnorm:SCnorm]{SCnorm::SCnorm()}}}
+\item{...}{other arguments passed on to \code{\link[SCnorm:SCnorm]{SCnorm::SCnorm()}}.}
+}
+\value{
+numerical matrix. normalized counts.
 }
 \description{
 SCnorm normalization

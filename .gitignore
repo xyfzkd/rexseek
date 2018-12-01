@@ -3,6 +3,7 @@ data-raw/external/
 
 # knitr output
 *_files/
+*_cache/
 
 # History files
 .Rhistory

@@ -9,10 +9,10 @@ read_mat(path, ...)
 \arguments{
 \item{path}{string.}
 
-\item{...}{other arguments passsed on to \code{\link[readr:read_tsv]{readr::read_tsv()}}}
+\item{...}{other arguments passsed on to \code{\link[readr:read_tsv]{readr::read_tsv()}}.}
 }
 \value{
-integer matrix
+integer matrix. counts.
 }
 \description{
 Read counts matrix

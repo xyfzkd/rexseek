@@ -19,26 +19,33 @@ norm_cpm_refer(mat, refer_gene_id)
 \arguments{
 \item{mat}{integer matrix. counts.}
 
-\item{top_n}{integer scalar. see \code{norm_cpm_top()} below}
+\item{top_n}{integer scalar. See \code{norm_cpm_top()} below.}
 
-\item{gene_type}{character. see \code{norm_cpm_rm()} below}
+\item{gene_type}{character. See \code{norm_cpm_rm()} below.}
 
-\item{refer_gene_id}{character. Ensembl transcript id, see \code{norm_cpm_refer()} below}
+\item{refer_gene_id}{character. Ensembl transcript id, see \code{norm_cpm_refer()}
+below.}
+}
+\value{
+numerical matrix. normalized counts.
 }
 \description{
-CPM normalization using counts sum of \emph{certain} genes as scaling factor
+CPM normalization using counts sum of \emph{certain} genes as scaling factor.
 }
 \details{
-some functions may throw errors
-
 \code{norm_cpm_total()} uses total genes
 
-\code{norm_cpm_top()} uses top 20 genes sorted by counts (assuming \code{top_n = 20L})
+\code{norm_cpm_top()} uses top 20 genes sorted by counts (assuming \code{top_n = 20L}).
 
-\code{norm_cpm_rm()} uses non-piRNA genes (assuming \code{gene_type = 'piRNA'})
+\code{norm_cpm_rm()} uses non-piRNA genes (assuming \code{gene_type = 'piRNA'}).
 
 \code{norm_cpm_refer()} uses given reference genes
 }
+\section{exception}{
+
+some functions may throw errors.
+}
+
 \examples{
 norm_cpm_total(sim_mat)
 

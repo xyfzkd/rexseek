@@ -11,9 +11,13 @@ plot_PCA(sce, shape = NULL, color = NULL)
 plot_TSNE(sce, shape = NULL, color = NULL)
 }
 \arguments{
-\item{sce}{A SingleCellExperiment object.}
+\item{sce}{SingleCellExperiment object.}
 
-\item{shape, }{color string. specify a column in \code{col_data} of \code{\link[=as_SingleCellExperiment]{as_SingleCellExperiment()}} to shape/color by}
+\item{shape, }{color string. Specify a column in \code{col_data} of
+\code{\link[=as_SingleCellExperiment]{as_SingleCellExperiment()}} to shape/color by.}
+}
+\value{
+ggplot object.
 }
 \description{
 plot PCA, TSNE

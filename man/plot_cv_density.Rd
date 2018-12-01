@@ -10,9 +10,9 @@ plot_cv_density(mat, refer_gene_id = "",
 \arguments{
 \item{mat}{integer matrix. counts}
 
-\item{refer_gene_id}{character.}
+\item{refer_gene_id}{character. Ensembl transcript id, add a vertical line for each gene to mark the corresponding CV (on x axis). Only genes in counts matrix would be shown. Usually these genes should be the reference genes you want to use for normalization.}
 
-\item{refer_gene_name}{character.}
+\item{refer_gene_name}{character. Transcript name}
 }
 \value{
 \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
@@ -21,6 +21,6 @@ plot_cv_density(mat, refer_gene_id = "",
 density plot of coefficient of variation
 }
 \examples{
-NULL
+
 
 }

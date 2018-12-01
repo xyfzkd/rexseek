@@ -26,6 +26,11 @@ remotes::install_github('dongzhuoer/rexseek', upgrade = F);
 
 For students in Lu Lab, please refer to [this guide](https://github.com/dongzhuoer/lulab-rotation-summary/blob/master/exseek.md)
 
+## to do
+
+1. document `as_SingleCellExperiment()`
+1. error message follow style guide
+
 ## develop
 
 Refer to this [post](https://dongzhuoer.github.io/_redirects/develop-upon-my-r-package.html)

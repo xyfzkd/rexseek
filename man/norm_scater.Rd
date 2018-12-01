@@ -11,15 +11,18 @@ norm_tmm(mat)
 norm_rle(mat)
 }
 \arguments{
-\item{mat}{integer matrix. counts}
+\item{mat}{integer matrix. counts.}
+}
+\value{
+numerical matrix. normalized counts.
 }
 \description{
 TMM/RLE normalization by scater package
 }
 \details{
-\code{norm_tmm()} performs TMM normalization
+\code{norm_tmm()} performs TMM normalization.
 
-\code{norm_rle()} performs RLE normalization
+\code{norm_rle()} performs RLE normalization.
 }
 \examples{
 norm_tmm(sim_mat)

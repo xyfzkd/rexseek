@@ -1,7 +1,7 @@
 testthat::context('Testing matrix process')
 if (basename(getwd()) == 'testthat') setwd('../..')
 
-#
+# read_mat --------------------
 testthat::test_that('read_mat()', {
 	temp_file <- tempfile()
 	sim_mat %>% tibble::as_tibble(rownames = 'transcript') %>%
@@ -14,7 +14,7 @@ testthat::test_that('read_mat()', {
 });
 
 
-
+# filter_low --------------------
 testthat::test_that('filter_low()', {
 	testthat::expect_true(is.matrix(filter_low(sim_mat)))
 	testthat::expect_identical(typeof(filter_low(sim_mat)), 'integer')
@@ -31,17 +31,13 @@ testthat::test_that('filter_low()', {
 });
 
 
-
+# plot_highest_exprs --------------------
 testthat::test_that('plot_highest_exprs()', {
-	testthat::expect_true(T);
-
-	# test `top_n` > `nrow(mat)`
-	as_SingleCellExperiment(sim_mat[1:10,]) %>% plot_highest_exprs()
-
-	as_SingleCellExperiment(sim_mat[1:10,]) %>% plot_highest_exprs()
+	plot_highest_exprs(sim_mat)
+	plot_highest_exprs(sim_mat[1:10,])  # test `top_n` > `nrow(mat)`
 });
 
-
+# plot_PCA --------------------
 testthat::test_that('plot_PCA()', {
 	testthat::expect_true(T);
 
@@ -52,7 +48,7 @@ testthat::test_that('plot_PCA()', {
 
 
 
-
+# plot_TSNE --------------------
 testthat::test_that('plot_TSNE()', {
 	testthat::expect_true(T);
 
@@ -76,9 +72,16 @@ testthat::test_that('coef_var_fun()', {
 testthat::test_that('plot_cv_density()', {
 	testthat::expect_true(T);
 
+	plot_cv_density(sim_mat, suggest_refer$id) # only show one which exsits in matrix
 	plot_cv_density(sim_mat, suggest_refer$id, suggest_refer$name)
-	plot_cv_density(sim_mat, suggest_refer$id) #
 	plot_cv_density(sim_mat, rownames(sim_mat)[1:6])
+
+	#warnings
+	plot_cv_density(sim_mat, rownames(sim_mat)[1:6], letters[1:3])
+	testthat::expect_warning(
+		plot_cv_density(sim_mat, rownames(sim_mat)[1:6], letters[1:3]),
+		"Ignoring refer_gene_name, since it isn't the same length as refer_gene_id"
+	)
 });
 
 
