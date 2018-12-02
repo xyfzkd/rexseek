@@ -33,6 +33,8 @@ testthat::test_that('filter_low()', {
 
 # plot_highest_exprs --------------------
 testthat::test_that('plot_highest_exprs()', {
+	testthat::expect_true(T);
+
 	plot_highest_exprs(sim_mat)
 	plot_highest_exprs(sim_mat[1:10,])  # test `top_n` > `nrow(mat)`
 });
