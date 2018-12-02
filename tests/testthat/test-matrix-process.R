@@ -60,11 +60,11 @@ testthat::test_that('plot_TSNE()', {
 
 
 
-testthat::test_that('coef_var_fun()', {
+testthat::test_that('cv_fun()', {
 	set.seed(0)
 
-	testthat::expect_equal(coef_var_fun(rnorm(5)), 0.9238771)
-	testthat::expect_equal(coef_var_fun(rpois(5, 4)), 0.5832981)
+	testthat::expect_equal(cv_fun(rnorm(5)), 0.9238771)
+	testthat::expect_equal(cv_fun(rpois(5, 4)), 0.5832981)
 });
 
 
