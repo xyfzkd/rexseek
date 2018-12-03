@@ -1,16 +1,15 @@
 #matrix_path = 'data-raw/external/scirep_sequential_qc.txt'
 #classinfo_path = 'scirep_classes.txt'
 
-#' @title Read counts matrix
+#' @title read counts matrix
 #'
 #' @param path string.
-#' @param ... other arguments passsed on to [readr::read_tsv()].
+#' @param ... other arguments passsed on to [readr::read_tsv()]
 #'
-#' @return integer matrix. counts.
+#' @return integer matrix
 #'
-#' @details
-#' In any case, first part (separated by `|`) of row names must be
-#' Ensembl transcript id
+#' @details In any case, first part (separated by `|`) of row names must be
+#'   Ensembl transcript id
 #'
 #' @export
 
@@ -22,16 +21,29 @@ read_mat <- function(path, ...) {
 		tibble::column_to_rownames('transcript') %>% as.matrix()
 }
 
+#' @title sample classinfo
+#'
+#' @param path string.
+#'
+#' @return string matrix
+#'
+#' @details column 1 represents sample name, column 2 represents classinfo
+#'
+#' @export
 
+# path = 'scirep_classes.txt'
+read_classinfo <- function(path, ...) {
+    read.table(path, sep = ",", header=T)
+}
 
 #' @title filter genes with low expression values
 #'
-#' @param mat integer matrix. counts.
+#' @param mat integer matrix.
 #' @param min_count, min_sample_per_gene integer scalar. For each gene, it must
 #'   contain at least `min_count` reads in at least `min_sample_per_gene`
 #'   samples. Otherwise, it would be dropped.
 #'
-#' @return integer matrix. counts.
+#' @return integer matrix.
 #'
 #' @examples
 #' filter_low(sim_mat)
@@ -43,38 +55,36 @@ filter_low <- function(mat, min_count = 2, min_sample_per_gene = 5) {
 	mat[keeped_row, ]
 }
 
-
-#' @title Plot highest expressed genes
+#' @imputation
 #'
-#' @details Each row represents a gene. In a row, each bar represents a sample,
-#' the x axis tells the percentage of counts accounted for across the whole
-#' dataset. (counts of that gene in that sample / total counts of all genes in
-#' all samples)
+#' @param mat integer matrix.
+#' @param tmp_path where tmp files stores, "data/expression_matrix/" for example.
+#' @param out_path where outputs stores, "data/matrix_processing/imputation/" for example.
+#' @param K imputation Kcluster
+#' @param N imputation ncores
+#' @return integer matrix named "scimpute_count.txt" stored in out_path.
 #'
-#' Genes are sorted by average expression.
-#'
-#' @param mat numeric matrix. counts.
-#' @param top_n integer scalar. How many genes to show. If greater that total
-#'   gene number, show all genes.
-#'
-#' @examples
-#' as_SingleCellExperiment(sim_mat) %>% plot_highest_exprs()
+#' @examples imputation(mat, "data/expression_matrix/", "data/matrix_processing/imputation/",5,3)
 #'
 #' @export
-plot_highest_exprs <- function(mat, top_n = 20) {
-	mat %>% as_SingleCellExperiment() %>%
-		{suppressMessages(scater::calculateQCMetrics(.))} %>%
+imputation <- function(mat,tmp_path=".",impute_path="./imputation/", K = 5, N = 3) {
+    suppressMessages(library("scImpute"))
+    write.csv(mat, paste(tmp_path,"tmpsave.csv",sep=""))
+    scimpute(count_path = paste(tmp_path,"tmpsave.csv",sep=""), infile = "csv",
+    outfile = "txt", out_dir = impute_path , Kcluster = K, ncores = N)
+    read.table(paste(out_path,"scimpute_count.txt",sep=""))
+}
+
+
+#' @export
+plot_highest_exprs <- function(sce, top_n = 20) {
+	sce %>% {suppressMessages(scater::calculateQCMetrics(.))} %>%
 		scater::plotHighestExprs(n = top_n)
 }
 
 
 # plot_group --------------
 
-#' @title workhorse of `plot_PCA/TSNE()`
-#'
-#' @details `plot_PCA(sce, shape, color) -> `plot_group_impl(sce, shape, color, scater::plotPCA)`
-#'
-#' @keywords internal
 plot_group_impl <- function(sce, shape = NULL, color = NULL, plot_fun) {
  	plot_fun(
  		sce,
@@ -85,11 +95,8 @@ plot_group_impl <- function(sce, shape = NULL, color = NULL, plot_fun) {
 
 #' @title plot PCA, TSNE
 #'
-#' @param sce SingleCellExperiment object.
-#' @param shape, color string. Specify a column in `col_data` of
-#'   [as_SingleCellExperiment()] to shape/color by.
-#'
-#' @return ggplot object.
+#' @param sce A SingleCellExperiment object.
+#' @param shape, color string. specify a column in `col_data` of [as_SingleCellExperiment()] to shape/color by
 #'
 #' @name plot_group
 NULL
@@ -99,7 +106,7 @@ NULL
 #'
 #' @examples
 #' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
-#'
+#' 
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')
@@ -116,7 +123,7 @@ plot_PCA <- function(sce, shape = NULL, color = NULL) {
 #'
 #' @examples
 #' as_SingleCellExperiment(sim_mat) %>% plot_PCA()
-#'
+#' 
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA()
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(shape = 'label')
 #' as_SingleCellExperiment(sim_mat, sim_sample_class) %>% plot_PCA(color = 'label')
@@ -132,7 +139,7 @@ plot_TSNE <- function(sce, shape = NULL, color = NULL) {
 
 #' get y axis range of ggplot object.
 get_y_range <- function(plot) {
-	 ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$y.range
+    ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$y.range
 }
 
 #' @title generate equally spaced y coordinates, not hit bottom nor top.
@@ -147,9 +154,9 @@ get_y_range <- function(plot) {
 #'
 #' @keywords internal
 seq_y <- function(plot, x) {
-	y_range <- get_y_range(plot)
-	by <- diff(y_range) / length(x)
-	seq(y_range[1] + by, y_range[2], by) - by/2
+    y_range <- get_y_range(plot)
+    by <- diff(y_range) / length(x)
+    seq(y_range[1] + by, y_range[2], by) - by/2
 }
 
 
@@ -166,6 +173,7 @@ seq_y <- function(plot, x) {
 #'
 #' @name plot_variance
 NULL
+
 
 
 
@@ -191,34 +199,35 @@ NULL
 # refer_gene_id = suggest_refer$id
 # refer_gene_name = suggest_refer$name
 plot_cv_density <- function(mat, refer_gene_id = '', refer_gene_name = refer_gene_id) {
-	cv <- mat %>% apply(1, cv_fun) %>%
-		{tibble::tibble(id = names(.), value = .)} %>%
-		dplyr::mutate(id = stringr::str_extract(id, '[^|]+'))
-	plot <- ggplot2::ggplot(cv, ggplot2::aes(value)) +
-		ggplot2::geom_density(color = 'blue') +
-		ggplot2::labs(x = 'coefficient of variation')
-
-	if (length(refer_gene_id) != length(refer_gene_name)) {
-		warning("Ignoring refer_gene_name, since it isn't the same length as refer_gene_id")
-		refer_gene_name = refer_gene_id
-	}
-	cv_refer <- tibble::tibble(id = refer_gene_id, name = refer_gene_name) %>%
-		dplyr::inner_join(cv, by = 'id')
-	if (nrow(cv_refer) == 0L) {
-		warning("None refer gene found in the count matrix")
-		return(plot)
-	}
-
-	plot + ggplot2::geom_vline(xintercept = cv_refer$value, color = 'green') +
-		ggplot2::geom_point(
-			ggplot2::aes(x = value, y = seq_y(plot, value)),
-			data = cv_refer, size = 2, shape = 1
-		) +
-		ggrepel::geom_label_repel(
-			ggplot2::aes(x = value, y = seq_y(plot, value), label = name),
-			data = cv_refer, hjust = 0.5
-		)
+    cv <- mat %>% apply(1, cv_fun) %>%
+    {tibble::tibble(id = names(.), value = .)} %>%
+    dplyr::mutate(id = stringr::str_extract(id, '[^|]+'))
+    plot <- ggplot2::ggplot(cv, ggplot2::aes(value)) +
+    ggplot2::geom_density(color = 'blue') +
+    ggplot2::labs(x = 'coefficient of variation')
+    
+    if (length(refer_gene_id) != length(refer_gene_name)) {
+        warning("Ignoring refer_gene_name, since it isn't the same length as refer_gene_id")
+        refer_gene_name = refer_gene_id
+    }
+    cv_refer <- tibble::tibble(id = refer_gene_id, name = refer_gene_name) %>%
+    dplyr::inner_join(cv, by = 'id')
+    if (nrow(cv_refer) == 0L) {
+        warning("None refer gene found in the count matrix")
+        return(plot)
+    }
+    
+    plot + ggplot2::geom_vline(xintercept = cv_refer$value, color = 'green') +
+    ggplot2::geom_point(
+    ggplot2::aes(x = value, y = seq_y(plot, value)),
+    data = cv_refer, size = 2, shape = 1
+    ) +
+    ggrepel::geom_label_repel(
+    ggplot2::aes(x = value, y = seq_y(plot, value), label = name),
+    data = cv_refer, hjust = 0.5
+    )
 }
+
 
 
 #' @details
@@ -242,41 +251,38 @@ plot_cv_density <- function(mat, refer_gene_id = '', refer_gene_name = refer_gen
 # refer_gene_id = rownames(mat)[1:6]
 # refer_gene_name = paste0('gene_', letters[1:6])
 plot_refer_violin <- function(mat, refer_gene_id, refer_gene_name = refer_gene_id) {
-	if (length(refer_gene_id) != length(refer_gene_name)) {
-		warning("Ignoring refer_gene_name, since it isn't the same length as refer_gene_id")
-		refer_gene_name = refer_gene_id
-	}
-
-	refer_gene <- tibble::tibble(id = refer_gene_id, name = refer_gene_name)
-	refer_count <- mat %>% tibble::as_tibble(rownames = 'id') %>%
-		dplyr::mutate(id = stringr::str_extract(id, '[^|]+')) %>%
-		dplyr::inner_join(refer_gene, ., by = 'id') %>% dplyr::select(-id)
-	if (nrow(refer_count) == 0L) {
-		warning('None refer gene found in the count matrix')
-		return(ggplot2::ggplot())
-	}
-
-	refer_count_long <- refer_count %>%	tidyr::gather('sample', 'count', -1) %>%
-		dplyr::mutate_at('name', as.factor)
-	g_violin <- refer_count_long %>%
-		ggplot2::ggplot(ggplot2::aes(name, log2(count + 0.001))) +
-			ggplot2::geom_violin() +
-			ggplot2::labs(x = 'reference transcripts', y = quote(log[2](count)))
-
-	# max y coordinate of each violin
-	y_max <- ggplot2::ggplot_build(g_violin)$data[[1]] %>% tibble::as_tibble() %>%
-		dplyr::group_by(x) %>% dplyr::arrange(dplyr::desc(y)) %>% dplyr::slice(1) %>%
-		dplyr::ungroup() %>% dplyr::arrange(x) %>% dplyr::select(x, y)
-
-	cv_df <- refer_count_long %>%
-		dplyr::group_by(name) %>% dplyr::summarise(cv = cv_fun(count)) %>%
-		dplyr::arrange(name) %>% dplyr::mutate(x = seq_along(name)) %>%
-		dplyr::inner_join(y_max, by = 'x') %>%
-		dplyr::mutate(y = y + diff(get_y_range(g_violin)) / 20) %>%
-		dplyr::mutate(cv = formatC(cv, digits = 3, format = 'f'))
-
- 	g_violin + ggplot2::geom_text(ggplot2::aes(x, y, label = cv), cv_df, color = 'blue')
+    if (length(refer_gene_id) != length(refer_gene_name)) {
+        warning("Ignoring refer_gene_name, since it isn't the same length as refer_gene_id")
+        refer_gene_name = refer_gene_id
+    }
+    
+    refer_gene <- tibble::tibble(id = refer_gene_id, name = refer_gene_name)
+    refer_count <- mat %>% tibble::as_tibble(rownames = 'id') %>%
+    dplyr::mutate(id = stringr::str_extract(id, '[^|]+')) %>%
+    dplyr::inner_join(refer_gene, ., by = 'id') %>% dplyr::select(-id)
+    if (nrow(refer_count) == 0L) {
+        warning('None refer gene found in the count matrix')
+        return(ggplot2::ggplot())
+    }
+    
+    refer_count_long <- refer_count %>%    tidyr::gather('sample', 'count', -1) %>%
+    dplyr::mutate_at('name', as.factor)
+    g_violin <- refer_count_long %>%
+    ggplot2::ggplot(ggplot2::aes(name, log2(count + 0.001))) +
+    ggplot2::geom_violin() +
+    ggplot2::labs(x = 'reference transcripts', y = quote(log[2](count)))
+    
+    # max y coordinate of each violin
+    y_max <- ggplot2::ggplot_build(g_violin)$data[[1]] %>% tibble::as_tibble() %>%
+    dplyr::group_by(x) %>% dplyr::arrange(dplyr::desc(y)) %>% dplyr::slice(1) %>%
+    dplyr::ungroup() %>% dplyr::arrange(x) %>% dplyr::select(x, y)
+    
+    cv_df <- refer_count_long %>%
+    dplyr::group_by(name) %>% dplyr::summarise(cv = cv_fun(count)) %>%
+    dplyr::arrange(name) %>% dplyr::mutate(x = seq_along(name)) %>%
+    dplyr::inner_join(y_max, by = 'x') %>%
+    dplyr::mutate(y = y + diff(get_y_range(g_violin)) / 20) %>%
+    dplyr::mutate(cv = formatC(cv, digits = 3, format = 'f'))
+    
+    g_violin + ggplot2::geom_text(ggplot2::aes(x, y, label = cv), cv_df, color = 'blue')
 }
-
-
-
